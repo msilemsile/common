@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
 
 import me.msile.app.androidapp.common.R;
 import me.msile.app.androidapp.common.ui.activity.ImmerseActivity;
@@ -22,7 +24,9 @@ import me.msile.app.androidapp.common.utils.StatusBarUtils;
 public class ExoPlayerActivity extends ImmerseActivity {
 
     public static final String INTENT_VIDEO_URI = "video_uri";
+    public static final String INTENT_VIDEO_TITLE = "video_title";
 
+    private TextView tvTitle;
     private ExoPlayerView mExoPlayerView;
     private ExoPlayerControlView mPlayControlView;
     private ExoPlayer mPlayer;
@@ -38,6 +42,7 @@ public class ExoPlayerActivity extends ImmerseActivity {
     }
 
     private void initViews() {
+        tvTitle = (TextView) findViewById(R.id.tv_title);
         View titleView = findViewById(R.id.ll_title);
         mExoPlayerView = findViewById(R.id.pv_player);
         mPlayControlView = findViewById(R.id.pcv_player);
@@ -69,6 +74,10 @@ public class ExoPlayerActivity extends ImmerseActivity {
     private void getDataFromIntent() {
         Intent intent = getIntent();
         if (intent != null) {
+            String title = intent.getStringExtra(INTENT_VIDEO_TITLE);
+            if (!TextUtils.isEmpty(title)){
+                tvTitle.setText(title);
+            }
             String mVideoUri = intent.getStringExtra(INTENT_VIDEO_URI);
             initializePlayer(mVideoUri);
         }

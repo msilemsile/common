@@ -9,8 +9,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import me.msile.app.androidapp.common.R;
 import me.msile.app.androidapp.common.ui.activity.ImmerseActivity;
@@ -23,7 +25,9 @@ import me.msile.app.androidapp.common.utils.StatusBarUtils;
 public class MediaPlayerActivity extends ImmerseActivity {
 
     public static final String INTENT_VIDEO_URI = "video_uri";
+    public static final String INTENT_VIDEO_TITLE = "video_title";
 
+    private TextView tvTitle;
     private MediaPlayerVideoView videoView;
     private MediaPlayerControllerLayout controllerLayout;
 
@@ -40,12 +44,17 @@ public class MediaPlayerActivity extends ImmerseActivity {
     private void getDataFromIntent() {
         Intent intent = getIntent();
         if (intent != null) {
+            String title = intent.getStringExtra(INTENT_VIDEO_TITLE);
+            if (!TextUtils.isEmpty(title)){
+                tvTitle.setText(title);
+            }
             String mVideoUri = intent.getStringExtra(INTENT_VIDEO_URI);
             initializePlayer(mVideoUri);
         }
     }
 
     private void initViews() {
+        tvTitle = (TextView) findViewById(R.id.tv_title);
         videoView = findViewById(R.id.player_video_view);
         controllerLayout = findViewById(R.id.player_controller);
         videoView.setMediaController(controllerLayout.getMediaController());

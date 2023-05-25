@@ -1,6 +1,6 @@
 package me.msile.app.androidapp.common.player.exoplayer;
 
-import static com.google.android.exoplayer2.Player.COMMAND_SET_VIDEO_SURFACE;
+import static androidx.media3.common.Player.COMMAND_SET_VIDEO_SURFACE;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,11 +16,11 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.video.VideoSize;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.common.VideoSize;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.AspectRatioFrameLayout;
 
 import me.msile.app.androidapp.common.R;
 

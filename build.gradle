@@ -94,7 +94,9 @@ dependencies {
     api "com.airbnb.android:lottie:${rootProject.lottieVersion}"
 
     //exoplayer库
-    api "com.google.android.exoplayer:exoplayer:${rootProject.exoplayerVersion}"
+    api "androidx.media3:media3-exoplayer:${rootProject.media3Version}"
+    api "androidx.media3:media3-exoplayer-dash:${rootProject.media3Version}"
+    api "androidx.media3:media3-ui:${rootProject.media3Version}"
 
     //下拉刷新
     api "io.github.scwang90:refresh-layout-kernel:${rootProject.smartRefreshVersion}"
