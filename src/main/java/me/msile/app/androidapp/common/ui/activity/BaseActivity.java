@@ -3,11 +3,14 @@ package me.msile.app.androidapp.common.ui.activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashSet;
@@ -18,6 +21,7 @@ import me.msile.app.androidapp.common.core.ActivityMethodProxy;
 import me.msile.app.androidapp.common.core.ActivityWeakRefHolder;
 import me.msile.app.androidapp.common.core.AppLoadingDialogHelper;
 import me.msile.app.androidapp.common.utils.ActivityUtils;
+import me.msile.app.androidapp.common.utils.ScreenUtils;
 import me.msile.app.androidapp.common.utils.StatusBarUtils;
 
 /**
@@ -33,6 +37,9 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ScreenUtils.setDisplayCutoutMode(this,WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES);
+        }
         Log.d(TAG, "BaseActivity 周期 onCreate -> this = " + this);
     }
 
