@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,9 +22,9 @@ import me.msile.app.androidapp.common.R;
 import me.msile.app.androidapp.common.permissions.PermissionHelper;
 import me.msile.app.androidapp.common.permissions.callback.PermissionCallback;
 import me.msile.app.androidapp.common.permissions.request.CameraPermissionRequest;
+import me.msile.app.androidapp.common.provider.FileProviderHelper;
 import me.msile.app.androidapp.common.storage.StorageHelper;
 import me.msile.app.androidapp.common.ui.toast.AppToast;
-import me.msile.app.androidapp.common.provider.FileProviderHelper;
 
 /**
  * 选择文件弹窗（文件、相册、拍照、录像）
@@ -35,12 +36,14 @@ public class AppPickDialog extends BaseRecyclerDialog {
     public static final int PICK_TYPE_GALLERY = 3;
     public static final int PICK_TYPE_IMAGE_CAPTURE = 4;
     public static final int PICK_TYPE_VIDEO_CAPTURE = 5;
+    public static final int PICK_TYPE_GALLERY_MULTI = 6;
 
     private LinearLayout llPickContent;
     private OnAppPickFileListener pickFileListener;
 
     private boolean allowPickMultiFile;
     private boolean showGallery;
+    private boolean showGalleryMulti;
     private boolean showFilePick;
     private boolean showImageCapture;
     private boolean showVideoCapture;
@@ -64,6 +67,7 @@ public class AppPickDialog extends BaseRecyclerDialog {
         if (savedInstanceState != null) {
             allowPickMultiFile = savedInstanceState.getBoolean("allowPickMultiFile");
             showGallery = savedInstanceState.getBoolean("showGallery");
+            showGalleryMulti = savedInstanceState.getBoolean("showGalleryMulti");
             showFilePick = savedInstanceState.getBoolean("showFilePick");
             showImageCapture = savedInstanceState.getBoolean("showImageCapture");
             showVideoCapture = savedInstanceState.getBoolean("showVideoCapture");
@@ -118,6 +122,10 @@ public class AppPickDialog extends BaseRecyclerDialog {
         //文件
         if (showFilePick || showAllPickOperate) {
             buildPickFileItem(PICK_TYPE_FILE);
+        }
+        //相册多选
+        if (showGalleryMulti || showAllPickOperate) {
+            buildPickFileItem(PICK_TYPE_GALLERY_MULTI);
         }
         //取消
         buildPickFileItem(PICK_TYPE_CANCEL);
@@ -179,6 +187,9 @@ public class AppPickDialog extends BaseRecyclerDialog {
             case PICK_TYPE_VIDEO_CAPTURE:
                 tvPick.setText("录像");
                 break;
+            case PICK_TYPE_GALLERY_MULTI:
+                tvPick.setText("相册(可多选)");
+                break;
             case PICK_TYPE_CANCEL:
                 tvPick.setText("取消");
                 tvPick.setTextColor(0xff999999);
@@ -207,6 +218,9 @@ public class AppPickDialog extends BaseRecyclerDialog {
             case PICK_TYPE_VIDEO_CAPTURE:
                 startVideoRecord();
                 break;
+            case PICK_TYPE_GALLERY_MULTI:
+                startPickFromGalleryMulti();
+                break;
             case PICK_TYPE_CANCEL:
                 if (pickFileListener != null) {
                     pickFileListener.onPickCancel();
@@ -225,12 +239,32 @@ public class AppPickDialog extends BaseRecyclerDialog {
             Intent pickFileIntent = new Intent(Intent.ACTION_GET_CONTENT);
             pickFileIntent.addCategory(Intent.CATEGORY_OPENABLE);
             pickFileIntent.setType("*/*");
-            pickFileIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowPickMultiFile);
+            pickFileIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startActivityForResult(pickFileIntent, PICK_TYPE_FILE);
         } catch (Exception e) {
             AppToast.toastMsg("选择文件失败");
             cancelPickDialog();
             Log.d("AppPickDialog", "startPickFile error");
+        }
+    }
+
+    /**
+     * 相册(多选)
+     */
+    private void startPickFromGalleryMulti() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            try {
+                Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
+                int pickImagesMaxLimit = MediaStore.getPickImagesMaxLimit();
+                intent.putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, pickImagesMaxLimit);
+                startActivityForResult(intent, PICK_TYPE_GALLERY_MULTI);
+            } catch (Exception e) {
+                AppToast.toastMsg("打开相册失败");
+                cancelPickDialog();
+                Log.d("AppPickDialog", "startPickFromGallery error");
+            }
+        } else {
+            AppToast.toastMsg("系统版本太低(>=13)，不支持相册多选");
         }
     }
 
@@ -324,7 +358,7 @@ public class AppPickDialog extends BaseRecyclerDialog {
     }
 
     /**
-     * 处理选择文件回调
+     * 处理选择文件/多选相册回调
      */
     private void handlePickFileResult(Intent intent) {
         Uri[] results = null;
@@ -374,6 +408,7 @@ public class AppPickDialog extends BaseRecyclerDialog {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case PICK_TYPE_FILE:
+                case PICK_TYPE_GALLERY_MULTI:
                     handlePickFileResult(data);
                     break;
                 case PICK_TYPE_GALLERY:
