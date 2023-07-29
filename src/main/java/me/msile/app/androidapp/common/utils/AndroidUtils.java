@@ -15,6 +15,7 @@ import android.util.Log;
 import android.webkit.WebSettings;
 
 import androidx.core.app.ActivityCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 
@@ -125,4 +126,38 @@ public class AndroidUtils {
     public static String getWebUserAgent() {
         return WebSettings.getDefaultUserAgent(ApplicationHolder.getAppContext());
     }
+
+    public static String getFileUriEndName(Uri uri) {
+        if (uri != null) {
+            String decodeDataString = Uri.decode(uri.toString());
+            int filenamePos = decodeDataString.lastIndexOf('/');
+            String filename = 0 <= filenamePos ? decodeDataString.substring(filenamePos + 1) : decodeDataString;
+            return filename;
+        }
+        return "";
+    }
+
+    public static String getFileRealNameFromUri(Uri fileUri) {
+        try {
+            if (fileUri != null) {
+                String fileName = null;
+                //1.check document file name
+                DocumentFile documentFile = DocumentFile.fromSingleUri(ApplicationHolder.getAppContext(), fileUri);
+                if (documentFile != null) {
+                    fileName = documentFile.getName();
+                    Log.i("AndroidUtils", "getFileRealNameFromUri DocumentFile fileName: " + fileName);
+                }
+                //2.check file url end name
+                if (TextUtils.isEmpty(fileName)) {
+                    fileName = getFileUriEndName(fileUri);
+                    Log.i("AndroidUtils", "getFileRealNameFromUri FileUriEndName fileName: " + fileName);
+                }
+                return fileName;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }
