@@ -45,4 +45,19 @@
         <item name="android:windowEnterAnimation">@anim/dialog_open_anim</item>
         <item name="android:windowExitAnimation">@anim/dialog_close_anim</item>
     </style>
+
+    <!-- device基础主题-->
+    <style name="device_base_theme" parent="@android:style/Theme.DeviceDefault.Light">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
+    <!-- device透明主题-->
+    <style name="device_translucent_theme" parent="device_base_theme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>
