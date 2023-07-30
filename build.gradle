@@ -98,12 +98,24 @@ dependencies {
     api "androidx.media3:media3-exoplayer-dash:${rootProject.media3Version}"
     api "androidx.media3:media3-ui:${rootProject.media3Version}"
 
+    //camerax库
+    api "androidx.camera:camera-core:${rootProject.cameraXVersion}"
+    api "androidx.camera:camera-camera2:${rootProject.cameraXVersion}"
+    // If you want to additionally use the CameraX Lifecycle library
+    api "androidx.camera:camera-lifecycle:${rootProject.cameraXVersion}"
+    // If you want to additionally use the CameraX VideoCapture library
+    api "androidx.camera:camera-video:${rootProject.cameraXVersion}"
+    // If you want to additionally use the CameraX View class
+    api "androidx.camera:camera-view:${rootProject.cameraXVersion}"
+    // If you want to additionally use the CameraX Extensions library
+    api "androidx.camera:camera-extensions:${rootProject.cameraXVersion}"
+
     //下拉刷新
     api "io.github.scwang90:refresh-layout-kernel:${rootProject.smartRefreshVersion}"
     api "io.github.scwang90:refresh-header-two-level:${rootProject.smartRefreshVersion}"
 
     //调试相关
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
