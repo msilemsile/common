@@ -27,18 +27,18 @@
             android:id="@+id/tv_capture_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="点击拍照,长按录像"/>
+            android:text="点击拍照,长按录像"
+            android:textColor="@color/white" />
     </LinearLayout>
 
     <ImageView
         android:id="@+id/iv_close"
         android:layout_width="@dimen/dp_50"
         android:layout_height="@dimen/dp_50"
-        android:layout_marginTop="@dimen/dp_30"
         android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_30"
         android:padding="8dp"
-        android:src="@mipmap/icon_close_white"/>
+        android:src="@mipmap/icon_close_white" />
 
     <ImageView
         android:id="@+id/iv_switch"
@@ -48,7 +48,7 @@
         android:layout_marginTop="@dimen/dp_30"
         android:layout_marginRight="@dimen/dp_20"
         android:padding="8dp"
-        android:src="@mipmap/icon_camera_switch"/>
+        android:src="@mipmap/icon_camera_switch" />
 
     <me.msile.app.androidapp.common.ui.widget.shapelayout.ShapeImageView
         android:id="@+id/iv_center"
@@ -61,4 +61,11 @@
         app:strokeColorT="@color/white"
         app:strokeWidthT="@dimen/dp_2" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:text="CameraHelper"
+        android:textSize="@dimen/sp_12"
+        android:textColor="@color/white" />
 </FrameLayout>

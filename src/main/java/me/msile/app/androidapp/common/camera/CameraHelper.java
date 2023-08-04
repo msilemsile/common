@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.exifinterface.media.ExifInterface;
 
 import java.io.File;
@@ -35,12 +37,27 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
 
     private Camera mCamera;
     private MediaRecorder mMediaRecorder;
-    private OnCameraHelperCallback cameraHelperCallback;
+    private OnCameraHelperCallback onCameraHelperCallback;
 
     private String mCameraOutputPath;
+    private boolean isFirstInit = true;
 
     public CameraHelper(@NonNull Activity activity) {
         super(activity);
+    }
+
+    @Override
+    protected void onActivityPause() {
+        isPrepared = false;
+        releaseMediaRecorder();
+        releaseCamera();
+    }
+
+    @Override
+    protected void onActivityResume() {
+        if (!isFirstInit && !isPrepared && mSurfaceView != null) {
+            prepare(mSurfaceView, isFrontCamera);
+        }
     }
 
     public void prepare(SurfaceView surfaceView) {
@@ -103,6 +120,7 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
                 setCameraInitParams(surfaceView.getWidth(), surfaceView.getHeight());
                 mCamera.startPreview();
                 isPrepared = true;
+                isFirstInit = false;
                 Log.i(TAG, "prepare viewHolder created");
             }
         } catch (Throwable e) {
@@ -128,8 +146,8 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
         }
     }
 
-    public void setCameraHelperCallback(OnCameraHelperCallback cameraHelperCallback) {
-        this.cameraHelperCallback = cameraHelperCallback;
+    public void setCameraHelperCallback(OnCameraHelperCallback onCameraHelperCallback) {
+        this.onCameraHelperCallback = onCameraHelperCallback;
     }
 
     public String getCameraOutputPath() {
@@ -165,14 +183,14 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
                             }
                             exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, picOrientation);
                             exifInterface.saveAttributes();
-                            if (cameraHelperCallback != null) {
-                                cameraHelperCallback.onTakePictureSuccess(mCameraOutputPath);
+                            if (onCameraHelperCallback != null) {
+                                onCameraHelperCallback.onTakePictureSuccess(mCameraOutputPath);
                             }
                             Log.i(TAG, "takePicture cache file: " + mCameraOutputPath);
                         } catch (Throwable e) {
                             e.printStackTrace();
-                            if (cameraHelperCallback != null) {
-                                cameraHelperCallback.onTakePictureError(e.getMessage());
+                            if (onCameraHelperCallback != null) {
+                                onCameraHelperCallback.onTakePictureError(e.getMessage());
                             }
                             Log.i(TAG, "takePicture write output error: " + e.getMessage());
                         }
@@ -181,8 +199,8 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            if (cameraHelperCallback != null) {
-                cameraHelperCallback.onTakePictureError(e.getMessage());
+            if (onCameraHelperCallback != null) {
+                onCameraHelperCallback.onTakePictureError(e.getMessage());
             }
             Log.i(TAG, "takePicture error: " + e.getMessage());
         }
@@ -237,8 +255,8 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
 
                 isCaptureStarted = true;
                 Log.i(TAG, "startCaptureVideo MediaRecorder.start");
-                if (cameraHelperCallback != null) {
-                    cameraHelperCallback.onCaptureVideoStart();
+                if (onCameraHelperCallback != null) {
+                    onCameraHelperCallback.onCaptureVideoStart();
                 }
             }
         } catch (Throwable e) {
@@ -257,6 +275,48 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void pauseCaptureVideo() {
+        if (!isPrepared) {
+            AppToast.toastMsg("未准备就绪");
+            return;
+        }
+        if (!isCaptureStarted) {
+            AppToast.toastMsg("拍摄未开始");
+            return;
+        }
+        try {
+            if (mMediaRecorder != null) {
+                mMediaRecorder.pause();
+                Log.i(TAG, "pauseCaptureVideo MediaRecorder pause");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Log.i(TAG, "pauseCaptureVideo error: " + e.getMessage());
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void resumeCaptureVideo() {
+        if (!isPrepared) {
+            AppToast.toastMsg("未准备就绪");
+            return;
+        }
+        if (!isCaptureStarted) {
+            AppToast.toastMsg("拍摄未开始");
+            return;
+        }
+        try {
+            if (mMediaRecorder != null) {
+                mMediaRecorder.resume();
+                Log.i(TAG, "resumeCaptureVideo MediaRecorder resume");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Log.i(TAG, "resumeCaptureVideo error: " + e.getMessage());
+        }
+    }
+
     public void stopCaptureVideo() {
         if (!isPrepared) {
             AppToast.toastMsg("未准备就绪");
@@ -270,15 +330,15 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
             if (mMediaRecorder != null) {
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
-                if (cameraHelperCallback != null) {
-                    cameraHelperCallback.onCaptureVideoSuccess(mCameraOutputPath);
+                if (onCameraHelperCallback != null) {
+                    onCameraHelperCallback.onCaptureVideoSuccess(mCameraOutputPath);
                 }
                 Log.i(TAG, "stopCaptureVideo MediaRecorder stop and reset");
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            if (cameraHelperCallback != null) {
-                cameraHelperCallback.onCaptureVideoError(e.getMessage());
+            if (onCameraHelperCallback != null) {
+                onCameraHelperCallback.onCaptureVideoError(e.getMessage());
             }
             Log.i(TAG, "stopCaptureVideo error: " + e.getMessage());
         }
@@ -337,6 +397,11 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
 
     private void releaseMediaRecorder() {
         try {
+            if (isCaptureStarted) {
+                if (onCameraHelperCallback != null) {
+                    onCameraHelperCallback.onCaptureVideoError("releaseMediaRecorder");
+                }
+            }
             if (mMediaRecorder != null) {
                 mMediaRecorder.reset();   // clear recorder configuration
                 mMediaRecorder.release(); // release the recorder object
@@ -346,9 +411,9 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
         } catch (Throwable e) {
             e.printStackTrace();
             Log.i(TAG, "releaseMediaRecorder error: " + e.getMessage());
-        } finally {
-            mMediaRecorder = null;
         }
+        mMediaRecorder = null;
+        isCaptureStarted = false;
     }
 
     private void releaseCamera() {
@@ -361,15 +426,12 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
         } catch (Throwable e) {
             e.printStackTrace();
             Log.i(TAG, "releaseCamera error: " + e.getMessage());
-        } finally {
-            mCamera = null;
         }
+        mCamera = null;
     }
 
     @Override
     public void onClear() {
-        releaseMediaRecorder();
-        releaseCamera();
     }
 
     @Override
@@ -410,6 +472,7 @@ public class CameraHelper extends ActivityWeakRefHolder implements SurfaceHolder
             setCameraInitParams(width, height);
             mCamera.startPreview();
             isPrepared = true;
+            isFirstInit = false;
             Log.i(TAG, "surfaceChanged prepared");
         } catch (Throwable e) {
             e.printStackTrace();

@@ -52,6 +52,7 @@ public class CameraXHelper extends ActivityWeakRefHolder {
     private boolean isFrontCamera;
     private OnCameraHelperCallback onCameraHelperCallback;
     private String mCameraOutputPath;
+    private boolean isFirstInit = true;
 
     public CameraXHelper(@NonNull Activity activity) {
         super(activity);
@@ -59,6 +60,30 @@ public class CameraXHelper extends ActivityWeakRefHolder {
 
     public void setCameraHelperCallback(OnCameraHelperCallback onCameraHelperCallback) {
         this.onCameraHelperCallback = onCameraHelperCallback;
+    }
+
+    @Override
+    protected void onActivityPause() {
+        isPrepared = false;
+        try {
+            if (isCaptureStarted) {
+                if (onCameraHelperCallback != null) {
+                    onCameraHelperCallback.onCaptureVideoError("releaseMediaRecorder");
+                }
+            }
+            if (processCameraProvider != null) {
+                processCameraProvider.unbindAll();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResume() {
+        if (!isFirstInit && !isPrepared && previewView != null) {
+            prepare(previewView, isFrontCamera);
+        }
     }
 
     public void prepare(PreviewView previewView) {
@@ -100,10 +125,13 @@ public class CameraXHelper extends ActivityWeakRefHolder {
                 preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
                 processCameraProvider.bindToLifecycle((LifecycleOwner) getHolderActivity(), cameraSelector, preview);
+                isPrepared = true;
+                isFirstInit = false;
             }
-            isPrepared = true;
+            Log.i(TAG, "startPreview");
         } catch (Throwable e) {
             e.printStackTrace();
+            Log.i(TAG, "startPreview error: " + e.getMessage());
         }
 
     }
@@ -114,6 +142,46 @@ public class CameraXHelper extends ActivityWeakRefHolder {
             return;
         }
         prepare(previewView, !isFrontCamera);
+    }
+
+    public void pauseCaptureVideo() {
+        if (!isPrepared) {
+            AppToast.toastMsg("未准备就绪");
+            return;
+        }
+        if (!isCaptureStarted) {
+            AppToast.toastMsg("拍摄未开始");
+            return;
+        }
+        try {
+            if (mMediaRecorder != null) {
+                mMediaRecorder.pause();
+                Log.i(TAG, "pauseCaptureVideo MediaRecorder pause");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Log.i(TAG, "pauseCaptureVideo error: " + e.getMessage());
+        }
+    }
+
+    public void resumeCaptureVideo() {
+        if (!isPrepared) {
+            AppToast.toastMsg("未准备就绪");
+            return;
+        }
+        if (!isCaptureStarted) {
+            AppToast.toastMsg("拍摄未开始");
+            return;
+        }
+        try {
+            if (mMediaRecorder != null) {
+                mMediaRecorder.resume();
+                Log.i(TAG, "resumeCaptureVideo MediaRecorder resume");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Log.i(TAG, "resumeCaptureVideo error: " + e.getMessage());
+        }
     }
 
     public void takePicture() {
@@ -139,6 +207,7 @@ public class CameraXHelper extends ActivityWeakRefHolder {
                 imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(getHolderActivity()), new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        Log.i(TAG, "takePicture onTakePictureSuccess: " + mCameraOutputPath);
                         if (onCameraHelperCallback != null) {
                             onCameraHelperCallback.onTakePictureSuccess(mCameraOutputPath);
                         }
@@ -146,14 +215,17 @@ public class CameraXHelper extends ActivityWeakRefHolder {
 
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
+                        Log.i(TAG, "takePicture onTakePictureError: " + exception.getMessage());
                         if (onCameraHelperCallback != null) {
                             onCameraHelperCallback.onTakePictureError(exception.getMessage());
                         }
                     }
                 });
             }
+            Log.i(TAG, "takePicture");
         } catch (Throwable e) {
             e.printStackTrace();
+            Log.i(TAG, "takePicture error: " + e.getMessage());
         }
     }
 
@@ -170,11 +242,12 @@ public class CameraXHelper extends ActivityWeakRefHolder {
             if (mMediaRecorder != null) {
                 mMediaRecorder.stop();
                 mMediaRecorder = null;
-                isCaptureStarted = false;
             }
+            Log.i(TAG, "stopCaptureVideo");
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        isCaptureStarted = false;
     }
 
     public boolean isCaptureStarted() {
@@ -183,7 +256,6 @@ public class CameraXHelper extends ActivityWeakRefHolder {
 
     @Override
     public void onClear() {
-
     }
 
     @SuppressLint("MissingPermission")
@@ -237,20 +309,18 @@ public class CameraXHelper extends ActivityWeakRefHolder {
                                         onCameraHelperCallback.onCaptureVideoStart();
                                     }
                                     isCaptureStarted = true;
+                                    Log.i(TAG, "startCaptureVideo onCaptureVideoStart");
                                 } else if (videoRecordEvent instanceof VideoRecordEvent.Pause) {
-
+                                    Log.i(TAG, "startCaptureVideo Pause");
                                 } else if (videoRecordEvent instanceof VideoRecordEvent.Resume) {
-
+                                    Log.i(TAG, "startCaptureVideo Resume");
                                 } else if (videoRecordEvent instanceof VideoRecordEvent.Finalize) {
-                                    VideoRecordEvent.Finalize finalizeEvent = (VideoRecordEvent.Finalize) videoRecordEvent;              // Handles a finalize event for the active recording, checking Finalize.getError()
+                                    VideoRecordEvent.Finalize finalizeEvent = (VideoRecordEvent.Finalize) videoRecordEvent;
+                                    // Handles a finalize event for the active recording, checking Finalize.getError()
                                     int error = finalizeEvent.getError();
                                     if (error != VideoRecordEvent.Finalize.ERROR_NONE) {
                                         if (onCameraHelperCallback != null) {
-                                            if (finalizeEvent.hasError()) {
-                                                onCameraHelperCallback.onCaptureVideoError(finalizeEvent.getCause().getMessage());
-                                            } else {
-                                                onCameraHelperCallback.onCaptureVideoError("finalizeEvent error: " + error);
-                                            }
+                                            onCameraHelperCallback.onCaptureVideoError("finalizeEvent error: " + error);
                                         }
                                     } else {
                                         OutputResults outputResults = finalizeEvent.getOutputResults();
@@ -259,15 +329,19 @@ public class CameraXHelper extends ActivityWeakRefHolder {
                                             onCameraHelperCallback.onCaptureVideoSuccess(mCameraOutputPath);
                                         }
                                     }
+                                    Log.i(TAG, "startCaptureVideo finalizeEvent");
+                                    isCaptureStarted = false;
                                 }
                             }
                         });
             }
+            Log.i(TAG, "startCaptureVideo");
         } catch (Throwable e) {
             e.printStackTrace();
             if (onCameraHelperCallback != null) {
                 onCameraHelperCallback.onCaptureVideoError(e.getMessage());
             }
+            isCaptureStarted = false;
         }
     }
 

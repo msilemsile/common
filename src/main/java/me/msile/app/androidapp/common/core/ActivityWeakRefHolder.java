@@ -30,8 +30,18 @@ public abstract class ActivityWeakRefHolder implements LifecycleEventObserver {
 
     @Override
     public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-        if (event == Lifecycle.Event.ON_DESTROY) {
-            clear();
+        if (event == Lifecycle.Event.ON_CREATE) {
+            onActivityCreate();
+        } else if (event == Lifecycle.Event.ON_START) {
+            onActivityStart();
+        } else if (event == Lifecycle.Event.ON_RESUME) {
+            onActivityResume();
+        } else if (event == Lifecycle.Event.ON_PAUSE) {
+            onActivityPause();
+        } else if (event == Lifecycle.Event.ON_STOP) {
+            onActivityStop();
+        } else if (event == Lifecycle.Event.ON_DESTROY) {
+            onActivityDestroy();
         }
     }
 
@@ -110,5 +120,29 @@ public abstract class ActivityWeakRefHolder implements LifecycleEventObserver {
      * 清理资源
      */
     public abstract void onClear();
+
+    protected void onActivityCreate() {
+
+    }
+
+    protected void onActivityStart() {
+
+    }
+
+    protected void onActivityResume() {
+
+    }
+
+    protected void onActivityPause() {
+
+    }
+
+    protected void onActivityStop() {
+
+    }
+
+    protected void onActivityDestroy() {
+        onClear();
+    }
 
 }
