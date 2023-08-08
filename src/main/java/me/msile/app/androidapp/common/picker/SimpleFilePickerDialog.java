@@ -1,5 +1,6 @@
-package me.msile.app.androidapp.common.filepicker;
+package me.msile.app.androidapp.common.picker;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +33,10 @@ public class SimpleFilePickerDialog extends BaseRecyclerDialog {
     private int currentPickType;
     private FilePickerHelper mFilePickerHelper;
 
+    public SimpleFilePickerDialog() {
+        setCancelable(false);
+    }
+
     @Override
     protected int getLayoutResId() {
         return me.msile.app.androidapp.common.R.layout.dialog_app_pick_file;
@@ -45,8 +50,26 @@ public class SimpleFilePickerDialog extends BaseRecyclerDialog {
 
     @Override
     protected void initData(boolean isFirstInit, @Nullable Bundle savedInstanceState) {
-        mFilePickerHelper = new FilePickerHelper(mActivity);
-        mFilePickerHelper.setAppPickFileListener(pickFileListener);
+        if (mFilePickerHelper == null) {
+            mFilePickerHelper = new FilePickerHelper(mActivity);
+        }
+        mFilePickerHelper.setAppPickFileListener(new FilePickerHelper.OnPickFileListener() {
+            @Override
+            public void onPickFile(@Nullable Uri[] uri) {
+                if (pickFileListener != null) {
+                    pickFileListener.onPickFile(uri);
+                }
+                dismiss();
+            }
+
+            @Override
+            public void onPickCancel() {
+                if (pickFileListener != null) {
+                    pickFileListener.onPickCancel();
+                }
+                dismiss();
+            }
+        });
         if (savedInstanceState != null) {
             allowPickMultiFile = savedInstanceState.getBoolean("allowPickMultiFile");
             showGallery = savedInstanceState.getBoolean("showGallery");

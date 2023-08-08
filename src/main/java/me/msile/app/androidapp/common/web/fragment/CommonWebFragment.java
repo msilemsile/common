@@ -1,7 +1,9 @@
 package me.msile.app.androidapp.common.web.fragment;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -10,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import me.msile.app.androidapp.common.R;
+import me.msile.app.androidapp.common.picker.FilePickerHelper;
+import me.msile.app.androidapp.common.picker.SimpleFilePickerDialog;
 import me.msile.app.androidapp.common.router.RouterManager;
 import me.msile.app.androidapp.common.ui.dialog.AppAlertDialog;
 import me.msile.app.androidapp.common.ui.fragment.BaseRecyclerFragment;
@@ -164,6 +168,65 @@ public class CommonWebFragment extends BaseRecyclerFragment implements WebViewLi
     @Override
     public void onPageFinished(String url) {
         wtlTitle.setRefreshClickable(true);
+    }
+
+    @Override
+    public boolean onShowFileChooser(String fileType, boolean isCaptureEnabled) {
+        FilePickerHelper.OnPickFileListener pickFileListener = new FilePickerHelper.OnPickFileListener() {
+            @Override
+            public void onPickFile(@Nullable Uri[] uri) {
+                if (webViewHolder != null) {
+                    webViewHolder.setFileChooserResult(uri);
+                }
+            }
+
+            @Override
+            public void onPickCancel() {
+                if (webViewHolder != null) {
+                    webViewHolder.setFileChooserResult(null);
+                }
+            }
+        };
+        if (TextUtils.isEmpty(fileType)) {
+            SimpleFilePickerDialog.build()
+                    .setShowAllPickOperate(true)
+                    .setAllowPickMultiFile(true)
+                    .setPickFileListener(pickFileListener)
+                    .show(mActivity);
+        } else {
+            if (fileType.startsWith("image/")) {
+                if (isCaptureEnabled) {
+                    SimpleFilePickerDialog.build()
+                            .setAutoStartPickType(FilePickerHelper.PICK_TYPE_IMAGE_CAPTURE)
+                            .setPickFileListener(pickFileListener)
+                            .show(mActivity);
+                } else {
+                    SimpleFilePickerDialog.build()
+                            .setAutoStartPickType(FilePickerHelper.PICK_TYPE_GALLERY)
+                            .setPickFileListener(pickFileListener)
+                            .show(mActivity);
+                }
+            } else if (fileType.startsWith("video/")) {
+                if (isCaptureEnabled) {
+                    SimpleFilePickerDialog.build()
+                            .setAutoStartPickType(FilePickerHelper.PICK_TYPE_VIDEO_CAPTURE)
+                            .setPickFileListener(pickFileListener)
+                            .show(mActivity);
+                } else {
+                    SimpleFilePickerDialog.build()
+                            .setShowVideoCapture(true)
+                            .setShowFilePick(true)
+                            .setPickFileListener(pickFileListener)
+                            .show(mActivity);
+                }
+            } else {
+                SimpleFilePickerDialog.build()
+                        .setShowAllPickOperate(true)
+                        .setPickFileListener(pickFileListener)
+                        .show(mActivity);
+            }
+        }
+        return true;
     }
 
     //--------------WebViewListener end-----------

@@ -1,4 +1,4 @@
-package me.msile.app.androidapp.common.filepicker;
+package me.msile.app.androidapp.common.picker;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -25,7 +25,7 @@ import me.msile.app.androidapp.common.ui.activity.BaseActivity;
 import me.msile.app.androidapp.common.ui.toast.AppToast;
 
 /**
- * 选择文件弹窗（文件、相册、拍照、录像）
+ * 选择文件bang帮助类（文件、相册、拍照、录像）
  */
 public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityMethodProxy {
 
@@ -106,6 +106,14 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
     private Uri cachePickFileUri = null;
     private String cachePickFilePath = null;
 
+    public String getCachePickFilePath() {
+        return cachePickFilePath;
+    }
+
+    public Uri getCachePickFileUri() {
+        return cachePickFileUri;
+    }
+
     /**
      * 拍照
      */
@@ -130,9 +138,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
 
             @Override
             public void onCancel() {
-                if (pickFileListener != null) {
-                    pickFileListener.onPickCancel();
-                }
+                AppToast.toastMsg("取消授权");
             }
 
             @Override
@@ -166,9 +172,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
 
             @Override
             public void onCancel() {
-                if (pickFileListener != null) {
-                    pickFileListener.onPickCancel();
-                }
+                AppToast.toastMsg("取消授权");
             }
 
             @Override
@@ -246,7 +250,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
 
     @Override
     public void onClear() {
-
+        pickFileListener = null;
     }
 
     public interface OnPickFileListener {
