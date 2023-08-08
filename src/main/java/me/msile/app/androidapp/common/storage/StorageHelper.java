@@ -1,11 +1,21 @@
 package me.msile.app.androidapp.common.storage;
 
+import android.Manifest;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.annotation.RequiresPermission;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import me.msile.app.androidapp.common.constants.AppCommonConstants;
 import me.msile.app.androidapp.common.core.ApplicationHolder;
@@ -164,5 +174,64 @@ public class StorageHelper {
     }
 
     // ----------- api >= android 10  end-------------
+
+    /**
+     * 列出保存在公共目录的文件名字(READ_EXTERNAL_STORAGE权限可选，未申请时之前app卸载的文件无法获取)
+     */
+    public static int TYPE_PUBLIC_DIR_DOWNLOAD = 0;
+    public static int TYPE_PUBLIC_DIR_DCIM = 1;
+
+    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    public static List<String> listPublicDirFileName(int publicDirType) {
+        List<String> fileNameList = new ArrayList<>();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentResolver contentResolver = ApplicationHolder.getAppContext().getContentResolver();
+                Uri publicDirUri;
+                if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+                    publicDirUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else {
+                    publicDirUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+                }
+                Cursor cursor = contentResolver.query(
+                        publicDirUri,
+                        null,
+                        MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME + "=?",
+                        new String[]{AppCommonConstants.APP_PREFIX_TAG}, null
+                );
+                if (cursor != null) {
+//                    int fileIdIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
+                    int fileNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                    while (cursor.moveToNext()) {
+                        //文件名
+                        String fileName = cursor.getString(fileNameIndex);
+                        fileNameList.add(fileName);
+                        //uri
+//                        long fileId = cursor.getLong(fileIdIndex);
+//                        Uri pathUri = downloadUri.buildUpon().appendPath(String.valueOf(fileId)).build();
+                    }
+                    cursor.close();
+                }
+            } else {
+                String publicDirPath;
+                if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+                    publicDirPath = getPublicDCIMDirPath();
+                } else {
+                    publicDirPath = getPublicDownloadsDirPath();
+                }
+                File downloadDir = new File(publicDirPath);
+                if (downloadDir.exists() && downloadDir.isDirectory()) {
+                    String[] fileNames = downloadDir.list();
+                    if (fileNames != null) {
+                        fileNameList.addAll(Arrays.asList(fileNames));
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        Log.i("StorageHelper", "listDownloadFilesName size: " + fileNameList.size() + " fileNameList: " + Arrays.toString(fileNameList.toArray()));
+        return fileNameList;
+    }
 
 }
