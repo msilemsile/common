@@ -130,8 +130,15 @@ public class AndroidUtils {
     public static String getFileUriEndName(Uri uri) {
         if (uri != null) {
             String decodeDataString = Uri.decode(uri.toString());
-            int filenamePos = decodeDataString.lastIndexOf('/');
-            String filename = 0 <= filenamePos ? decodeDataString.substring(filenamePos + 1) : decodeDataString;
+            return getFileUriEndName(decodeDataString);
+        }
+        return "";
+    }
+
+    public static String getFileUriEndName(String uriString) {
+        if (uriString != null) {
+            int filenamePos = uriString.lastIndexOf('/');
+            String filename = 0 <= filenamePos ? uriString.substring(filenamePos + 1) : uriString;
             return filename;
         }
         return "";

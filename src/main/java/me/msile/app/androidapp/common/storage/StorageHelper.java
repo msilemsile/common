@@ -30,6 +30,8 @@ public class StorageHelper {
     //下载目录名称(android 10 +)
     public static String RELATIVE_EXTERNAL_DIR_PATH = "/" + AppCommonConstants.APP_PREFIX_TAG + "/";
 
+    public static String CONTENT_DOCUMENT_BASE_PATH = "content://com.android.externalstorage.documents/document/primary:";
+
     /**
      * 创建分享文件
      *
@@ -172,6 +174,14 @@ public class StorageHelper {
     }
 
     // ----------- api >= android 10  end-------------
+
+    public static String getContentPubDownloadDirPath() {
+        return CONTENT_DOCUMENT_BASE_PATH + Environment.DIRECTORY_DOWNLOADS + Uri.encode("/" + AppCommonConstants.APP_PREFIX_TAG);
+    }
+
+    public static String getContentPubDCIMDirPath() {
+        return CONTENT_DOCUMENT_BASE_PATH + Environment.DIRECTORY_DCIM + Uri.encode("/" + AppCommonConstants.APP_PREFIX_TAG);
+    }
 
     /**
      * 列出保存在公共目录的文件名字(READ_EXTERNAL_STORAGE权限可选，未申请时之前app卸载的文件无法获取)

@@ -5,12 +5,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import me.msile.app.androidapp.common.storage.StorageHelper;
 
 /**
  * intent工具类
@@ -211,5 +215,17 @@ public final class IntentUtils {
         intent.putExtra("app_package", context.getPackageName());
         intent.putExtra("app_uid", context.getApplicationInfo().uid);
         return getIntent(intent, true);
+    }
+
+    public static Intent getToDownloadDirIntent() {
+        Uri uri = Uri.parse(StorageHelper.getContentPubDownloadDirPath());
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return intent;
     }
 }
