@@ -1,6 +1,5 @@
 package me.msile.app.androidapp.common.storage;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,7 +9,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.annotation.RequiresPermission;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -179,17 +177,32 @@ public class StorageHelper {
      * 列出保存在公共目录的文件名字(READ_EXTERNAL_STORAGE权限可选，未申请时之前app卸载的文件无法获取)
      */
     public static int TYPE_PUBLIC_DIR_DOWNLOAD = 0;
-    public static int TYPE_PUBLIC_DIR_DCIM = 1;
+    public static int TYPE_PUBLIC_DIR_DCIM_IMAGE = 1;
+    public static int TYPE_PUBLIC_DIR_DCIM_VIDEO = 2;
 
-    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    public static List<String> listPubDownloadDirFileName() {
+        return listPublicDirFileName(TYPE_PUBLIC_DIR_DOWNLOAD);
+    }
+
+    public static List<String> listPubDCIMDirFileName() {
+        List<String> imageDirFileName = listPublicDirFileName(TYPE_PUBLIC_DIR_DCIM_IMAGE);
+        List<String> videoDirFileName = listPublicDirFileName(TYPE_PUBLIC_DIR_DCIM_VIDEO);
+        List<String> dcimDirList = new ArrayList<>();
+        dcimDirList.addAll(imageDirFileName);
+        dcimDirList.addAll(videoDirFileName);
+        return dcimDirList;
+    }
+
     public static List<String> listPublicDirFileName(int publicDirType) {
         List<String> fileNameList = new ArrayList<>();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentResolver contentResolver = ApplicationHolder.getAppContext().getContentResolver();
                 Uri publicDirUri;
-                if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+                if (publicDirType == TYPE_PUBLIC_DIR_DCIM_IMAGE) {
                     publicDirUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if (publicDirType == TYPE_PUBLIC_DIR_DCIM_VIDEO) {
+                    publicDirUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
                 } else {
                     publicDirUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
                 }
@@ -214,7 +227,7 @@ public class StorageHelper {
                 }
             } else {
                 String publicDirPath;
-                if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+                if (publicDirType == TYPE_PUBLIC_DIR_DCIM_IMAGE) {
                     publicDirPath = getPublicDCIMDirPath();
                 } else {
                     publicDirPath = getPublicDownloadsDirPath();
