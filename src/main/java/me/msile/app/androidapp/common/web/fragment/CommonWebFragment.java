@@ -174,14 +174,14 @@ public class CommonWebFragment extends BaseRecyclerFragment implements WebViewLi
     public boolean onShowFileChooser(String fileType, boolean isCaptureEnabled) {
         FilePickerHelper.OnPickFileListener pickFileListener = new FilePickerHelper.OnPickFileListener() {
             @Override
-            public void onPickFile(@Nullable Uri[] uri) {
+            public void onPickFile(@Nullable Uri[] uri, int pickType) {
                 if (webViewHolder != null) {
                     webViewHolder.setFileChooserResult(uri);
                 }
             }
 
             @Override
-            public void onPickCancel() {
+            public void onPickCancel(int pickType) {
                 if (webViewHolder != null) {
                     webViewHolder.setFileChooserResult(null);
                 }

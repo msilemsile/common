@@ -6,17 +6,28 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import me.msile.app.androidapp.common.constants.AppCommonConstants;
 import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.log.LogHelper;
+import me.msile.app.androidapp.common.rx.DefaultObserver;
+import me.msile.app.androidapp.common.rx.RxTransformerUtils;
+import me.msile.app.androidapp.common.utils.AndroidUtils;
+import me.msile.app.androidapp.common.utils.FileUtils;
 
 public class StorageHelper {
 
@@ -255,6 +266,68 @@ public class StorageHelper {
         }
         Log.i("StorageHelper", "listDownloadFilesName size: " + fileNameList.size() + " fileNameList: " + Arrays.toString(fileNameList.toArray()));
         return fileNameList;
+    }
+
+    public static void copyUriToCacheFile(final List<Uri> fileUriList, final CopyCacheFileCallback copyCacheFileCallback) {
+        if (fileUriList == null || fileUriList.isEmpty() || copyCacheFileCallback == null) {
+            return;
+        }
+        Observable.create(new ObservableOnSubscribe<List<CacheFileInfo>>() {
+                    @Override
+                    public void subscribe(@NonNull ObservableEmitter<List<CacheFileInfo>> emitter) {
+                        final List<CacheFileInfo> cacheFileInfoList = new ArrayList<>();
+                        for (int i = 0; i < fileUriList.size(); i++) {
+                            Uri viewFileUri = fileUriList.get(i);
+                            String cacheFileName = "cache_" + System.currentTimeMillis();
+                            File cacheFile = StorageHelper.createCacheFile(cacheFileName);
+                            String fileRealNameFromUri = AndroidUtils.getFileRealNameFromUri(viewFileUri);
+                            if (TextUtils.isEmpty(fileRealNameFromUri)) {
+                                fileRealNameFromUri = cacheFileName;
+                            }
+                            LogHelper.print("copyFileToOtherFile start copy cacheFile: " + cacheFileName);
+                            try {
+                                FileInputStream fileInputStream = (FileInputStream) ApplicationHolder.getAppContext().getContentResolver().openInputStream(viewFileUri);
+                                boolean copyFileToOtherFile = FileUtils.copyFileToOtherFile(fileInputStream, cacheFile);
+                                if (copyFileToOtherFile) {
+                                    CacheFileInfo cacheFileInfo = new CacheFileInfo(cacheFile);
+                                    cacheFileInfo.setOriginFileUri(viewFileUri);
+                                    cacheFileInfo.setOriginFileName(fileRealNameFromUri);
+                                    cacheFileInfoList.add(cacheFileInfo);
+                                    LogHelper.print("copyFileToOtherFile copy success cache file path: " + cacheFile.getAbsolutePath());
+                                } else {
+                                    LogHelper.print("copyFileToOtherFile copy error");
+                                }
+                                emitter.onNext(cacheFileInfoList);
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                                LogHelper.print("copyFileToOtherFile try catch error");
+                                //delete all cache files
+                                try {
+                                    cacheFile.delete();
+                                    for (int j = 0; j < cacheFileInfoList.size(); j++) {
+                                        File file = cacheFileInfoList.get(i).getFile();
+                                        file.delete();
+                                    }
+                                } catch (Throwable delError) {
+                                    e.printStackTrace();
+                                    LogHelper.print("copyFileToOtherFile delete all cache file");
+                                }
+                                emitter.onError(e);
+                            }
+                        }
+                    }
+                }).compose(RxTransformerUtils.mainSchedulers())
+                .subscribe(new DefaultObserver<List<CacheFileInfo>>() {
+                    @Override
+                    protected void onSuccess(List<CacheFileInfo> files) {
+                        copyCacheFileCallback.onSuccess(files);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        copyCacheFileCallback.onError(e.getMessage());
+                    }
+                });
     }
 
 }

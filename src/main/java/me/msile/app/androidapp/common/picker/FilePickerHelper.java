@@ -36,6 +36,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
     public static final int PICK_TYPE_GALLERY_MULTI = 5;
 
     private OnPickFileListener pickFileListener;
+    private int currentPickType;
 
     public FilePickerHelper(@NonNull Activity activity) {
         super(activity);
@@ -63,6 +64,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
             pickFileIntent.setType("*/*");
             pickFileIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             getHolderActivity().startActivityForResult(pickFileIntent, PICK_TYPE_FILE);
+            currentPickType = PICK_TYPE_FILE;
         } catch (Exception e) {
             AppToast.toastMsg("选择文件失败");
             Log.d("AppPickDialog", "startPickFile error");
@@ -79,6 +81,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
                 int pickImagesMaxLimit = MediaStore.getPickImagesMaxLimit();
                 intent.putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, pickImagesMaxLimit);
                 getHolderActivity().startActivityForResult(intent, PICK_TYPE_GALLERY_MULTI);
+                currentPickType = PICK_TYPE_GALLERY_MULTI;
             } catch (Exception e) {
                 AppToast.toastMsg("打开相册失败");
                 Log.d("AppPickDialog", "startPickFromGallery error");
@@ -96,6 +99,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
             getHolderActivity().startActivityForResult(intent, PICK_TYPE_GALLERY);
+            currentPickType = PICK_TYPE_GALLERY;
         } catch (Exception e) {
             AppToast.toastMsg("打开相册失败");
             Log.d("AppPickDialog", "startPickFromGallery error");
@@ -130,6 +134,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
                     cachePickFilePath = cacheImageFile.getAbsolutePath();
                     captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                     getHolderActivity().startActivityForResult(captureIntent, PICK_TYPE_IMAGE_CAPTURE);
+                    currentPickType = PICK_TYPE_IMAGE_CAPTURE;
                 } catch (Exception e) {
                     AppToast.toastMsg("打开相机失败");
                     Log.d("AppPickDialog", "onClickImageCapture error");
@@ -164,6 +169,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
                     cachePickFilePath = cacheVideoFile.getAbsolutePath();
                     captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                     getHolderActivity().startActivityForResult(captureIntent, PICK_TYPE_VIDEO_CAPTURE);
+                    currentPickType = PICK_TYPE_VIDEO_CAPTURE;
                 } catch (Exception e) {
                     AppToast.toastMsg("打开录像失败");
                     Log.d("AppPickDialog", "onClickImageCapture error");
@@ -205,7 +211,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
             }
         }
         if (pickFileListener != null) {
-            pickFileListener.onPickFile(results);
+            pickFileListener.onPickFile(results, currentPickType);
         }
     }
 
@@ -223,7 +229,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
             }
         }
         if (pickFileListener != null) {
-            pickFileListener.onPickFile(new Uri[]{result});
+            pickFileListener.onPickFile(new Uri[]{result}, currentPickType);
         }
     }
 
@@ -243,7 +249,7 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
             }
         } else {
             if (pickFileListener != null) {
-                pickFileListener.onPickCancel();
+                pickFileListener.onPickCancel(currentPickType);
             }
         }
     }
@@ -254,10 +260,10 @@ public class FilePickerHelper extends ActivityWeakRefHolder implements ActivityM
     }
 
     public interface OnPickFileListener {
-        default void onPickFile(@Nullable Uri[] uri) {
+        default void onPickFile(@Nullable Uri[] uri, int pickType) {
         }
 
-        default void onPickCancel() {
+        default void onPickCancel(int pickType) {
         }
     }
 }

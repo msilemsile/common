@@ -55,17 +55,17 @@ public class SimpleFilePickerDialog extends BaseRecyclerDialog {
         }
         mFilePickerHelper.setAppPickFileListener(new FilePickerHelper.OnPickFileListener() {
             @Override
-            public void onPickFile(@Nullable Uri[] uri) {
+            public void onPickFile(@Nullable Uri[] uri, int pickType) {
                 if (pickFileListener != null) {
-                    pickFileListener.onPickFile(uri);
+                    pickFileListener.onPickFile(uri,pickType);
                 }
                 dismiss();
             }
 
             @Override
-            public void onPickCancel() {
+            public void onPickCancel(int pickType) {
                 if (pickFileListener != null) {
-                    pickFileListener.onPickCancel();
+                    pickFileListener.onPickCancel(pickType);
                 }
                 dismiss();
             }
@@ -229,7 +229,7 @@ public class SimpleFilePickerDialog extends BaseRecyclerDialog {
                 break;
             case 0:
                 if (pickFileListener != null) {
-                    pickFileListener.onPickCancel();
+                    pickFileListener.onPickCancel(0);
                 }
                 dismiss();
                 break;
