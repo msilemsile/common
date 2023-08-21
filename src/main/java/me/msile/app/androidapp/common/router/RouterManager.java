@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import me.msile.app.androidapp.common.core.AppManager;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
 import me.msile.app.androidapp.common.utils.ActivityUtils;
 import me.msile.app.androidapp.common.utils.IntentUtils;
 
@@ -49,7 +48,7 @@ public class RouterManager {
     public static void startThirdPartySchemaIntent(String url) {
         try {
             Intent intent = IntentUtils.getThirdPartySchemaIntent(url, true);
-            ApplicationHolder.getAppContext().startActivity(intent);
+            AppManager.INSTANCE.getApplication().startActivity(intent);
         } catch (Exception e) {
             Log.d("RouterManager", "startThirdPartySchemaIntent error");
         }
@@ -63,7 +62,7 @@ public class RouterManager {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(SCHEMA_APP + "://"));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            ApplicationHolder.getAppContext().startActivity(intent);
+            AppManager.INSTANCE.getApplication().startActivity(intent);
         } catch (Exception e) {
             Log.d("RouterManager", "startThirdPartySchemaIntent error");
         }

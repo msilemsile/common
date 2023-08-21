@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.msile.app.androidapp.common.core.ActivityWeakRefHolder;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.permissions.base.BasePermissionRequest;
 import me.msile.app.androidapp.common.permissions.callback.PermissionCallback;
 import me.msile.app.androidapp.common.ui.dialog.AppAlertDialog;
@@ -168,7 +168,7 @@ public class PermissionHelper extends ActivityWeakRefHolder {
                         if (mCallback != null) {
                             mCallback.onGoSetting();
                         }
-                        Intent appDetailsSettingsIntent = IntentUtils.getLaunchAppDetailsSettingsIntent(ApplicationHolder.getAppContext().getPackageName(), false);
+                        Intent appDetailsSettingsIntent = IntentUtils.getLaunchAppDetailsSettingsIntent(AppManager.INSTANCE.getApplication().getPackageName(), false);
                         activityWithCheck.startActivity(appDetailsSettingsIntent);
                     }
                 }).show(activityWithCheck);

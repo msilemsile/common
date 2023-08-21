@@ -11,6 +11,8 @@ import java.lang.ref.WeakReference;
  */
 public enum AppManager {
     INSTANCE;
+    //全局Application
+    private Application application;
     //主界面(弱引用，防止内存泄露)
     private WeakReference<Activity> mMainACReference;
     //当前界面(弱引用，防止内存泄露)
@@ -23,6 +25,7 @@ public enum AppManager {
     private Application.ActivityLifecycleCallbacks appLifecycleCallback;
 
     public void init(Application application) {
+        this.application = application;
         if (appLifecycleCallback == null) {
             appLifecycleCallback = new Application.ActivityLifecycleCallbacks() {
                 @Override
@@ -92,6 +95,10 @@ public enum AppManager {
             return null;
         }
         return mMainACReference.get();
+    }
+
+    public Application getApplication() {
+        return application;
     }
 
     public boolean isAppForeground() {

@@ -8,7 +8,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.text.TextUtils;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 
 /**
  * 剪切板信息copy
@@ -23,7 +23,7 @@ public class ClipboardUtils {
         if (TextUtils.isEmpty(textCase)) {
             return;
         }
-        ClipboardManager cmb = (ClipboardManager) ApplicationHolder.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipboardManager cmb = (ClipboardManager) AppManager.INSTANCE.getApplication().getSystemService(Context.CLIPBOARD_SERVICE);
         if (cmb != null) {
             ClipData clipData = ClipData.newPlainText(label, textCase);
             cmb.setPrimaryClip(clipData);
@@ -31,7 +31,7 @@ public class ClipboardUtils {
     }
 
     public static String getClipboardFirstLabel() {
-        ClipboardManager manager = (ClipboardManager) ApplicationHolder.getAppContext().getSystemService(CLIPBOARD_SERVICE);
+        ClipboardManager manager = (ClipboardManager) AppManager.INSTANCE.getApplication().getSystemService(CLIPBOARD_SERVICE);
         if (manager == null) {
             return "";
         }
@@ -51,7 +51,7 @@ public class ClipboardUtils {
     }
 
     public static String getClipboardFirstData() {
-        ClipboardManager manager = (ClipboardManager) ApplicationHolder.getAppContext().getSystemService(CLIPBOARD_SERVICE);
+        ClipboardManager manager = (ClipboardManager) AppManager.INSTANCE.getApplication().getSystemService(CLIPBOARD_SERVICE);
         if (manager == null) {
             return "";
         }
@@ -75,7 +75,7 @@ public class ClipboardUtils {
     }
 
     public static void clearClipboardFirstData() {
-        ClipboardManager manager = (ClipboardManager) ApplicationHolder.getAppContext().getSystemService(CLIPBOARD_SERVICE);
+        ClipboardManager manager = (ClipboardManager) AppManager.INSTANCE.getApplication().getSystemService(CLIPBOARD_SERVICE);
         if (manager != null) {
             manager.setPrimaryClip(ClipData.newPlainText("", ""));
         }

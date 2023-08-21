@@ -3,7 +3,7 @@ package me.msile.app.androidapp.common.permissions.request;
 import android.Manifest;
 
 import me.msile.app.androidapp.common.R;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.permissions.base.BasePermissionRequest;
 
 /**
@@ -28,7 +28,7 @@ public class CameraPermissionRequest extends BasePermissionRequest {
 
     @Override
     public String getRequestTitle() {
-        return ApplicationHolder.getAppContext().getString(R.string.app_name) + "请求使用相机功能";
+        return AppManager.INSTANCE.getApplication().getString(R.string.app_name) + "请求使用相机功能";
     }
 
     @Override

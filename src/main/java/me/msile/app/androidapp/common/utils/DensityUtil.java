@@ -2,7 +2,7 @@ package me.msile.app.androidapp.common.utils;
 
 import android.content.Context;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 
 /**
  * 测量工具
@@ -12,13 +12,13 @@ public class DensityUtil {
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
      */
     public static int dip2px(float dpValue) {
-        final float scale = ApplicationHolder.getAppContext().getResources().getDisplayMetrics().density;
+        final float scale = AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
 
     public static int dip2px(Context ctx, float dp) {
         if (ctx == null) {
-            ctx = ApplicationHolder.getAppContext();
+            ctx = AppManager.INSTANCE.getApplication();
         }
         if (ctx == null) {
             return 0;
@@ -33,17 +33,17 @@ public class DensityUtil {
      * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
      */
     public static int px2dip(float pxValue) {
-        final float scale = ApplicationHolder.getAppContext().getResources().getDisplayMetrics().density;
+        final float scale = AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
 
     public static int sp2px(float sp) {
-        final float scale = ApplicationHolder.getAppContext().getResources().getDisplayMetrics().scaledDensity;
+        final float scale = AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().scaledDensity;
         return (int) (sp * scale + 0.5f);
     }
 
     public static float getFrontScale() {
-        float frontScale = ApplicationHolder.getAppContext().getResources().getConfiguration().fontScale;
+        float frontScale = AppManager.INSTANCE.getApplication().getResources().getConfiguration().fontScale;
         return frontScale;
     }
 
@@ -51,18 +51,18 @@ public class DensityUtil {
      * 获取屏幕高度（像素）
      */
     public static int getDisplayHeightPixels() {
-        return ApplicationHolder.getAppContext().getResources().getDisplayMetrics().heightPixels;
+        return AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().heightPixels;
     }
 
     public static float getDensity() {
-        return ApplicationHolder.getAppContext().getResources().getDisplayMetrics().density;
+        return AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().density;
     }
 
     /**
      * 获取屏幕宽度(像素)
      */
     public static int getDisplayWidthPixels() {
-        return ApplicationHolder.getAppContext().getResources().getDisplayMetrics().widthPixels;
+        return AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().widthPixels;
     }
 
     /**

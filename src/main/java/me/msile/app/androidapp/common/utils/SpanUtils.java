@@ -61,7 +61,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 
 /**
  * 文本span工具
@@ -1260,7 +1260,7 @@ public final class SpanUtils {
 
         private CustomImageSpan(final Bitmap b, final int verticalAlignment) {
             super(verticalAlignment);
-            mDrawable = new BitmapDrawable(ApplicationHolder.getAppContext().getResources(), b);
+            mDrawable = new BitmapDrawable(AppManager.INSTANCE.getApplication().getResources(), b);
             mDrawable.setBounds(
                     0, 0, mDrawable.getIntrinsicWidth(), mDrawable.getIntrinsicHeight()
             );
@@ -1293,9 +1293,9 @@ public final class SpanUtils {
                 Bitmap bitmap;
                 try {
                     InputStream is =
-                            ApplicationHolder.getAppContext().getContentResolver().openInputStream(mContentUri);
+                            AppManager.INSTANCE.getApplication().getContentResolver().openInputStream(mContentUri);
                     bitmap = BitmapFactory.decodeStream(is);
-                    drawable = new BitmapDrawable(ApplicationHolder.getAppContext().getResources(), bitmap);
+                    drawable = new BitmapDrawable(AppManager.INSTANCE.getApplication().getResources(), bitmap);
                     drawable.setBounds(
                             0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()
                     );
@@ -1307,7 +1307,7 @@ public final class SpanUtils {
                 }
             } else {
                 try {
-                    drawable = ContextCompat.getDrawable(ApplicationHolder.getAppContext(), mResourceId);
+                    drawable = ContextCompat.getDrawable(AppManager.INSTANCE.getApplication(), mResourceId);
                     drawable.setBounds(
                             0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()
                     );

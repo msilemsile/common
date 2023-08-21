@@ -18,7 +18,7 @@ import me.msile.app.androidapp.common.contact.callback.OnGetContactListener;
 import me.msile.app.androidapp.common.contact.model.ContactModel;
 import me.msile.app.androidapp.common.core.ActivityMethodProxy;
 import me.msile.app.androidapp.common.core.ActivityWeakRefHolder;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.ui.activity.BaseActivity;
 
 /**
@@ -131,7 +131,7 @@ public class ContactHelper extends ActivityWeakRefHolder implements ActivityMeth
         List<ContactModel> contactModelList = new ArrayList<>();
         try {
             String[] projection = new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
-            cursor = ApplicationHolder.getAppContext().getContentResolver().query(phoneContactUri, projection, null, null, null);
+            cursor = AppManager.INSTANCE.getApplication().getContentResolver().query(phoneContactUri, projection, null, null, null);
             if (cursor != null && cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
                     int numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);

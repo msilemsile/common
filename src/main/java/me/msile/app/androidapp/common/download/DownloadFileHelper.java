@@ -28,7 +28,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.core.MainThreadHolder;
 import me.msile.app.androidapp.common.log.LogHelper;
 import me.msile.app.androidapp.common.net.callback.DefaultOkHttpCallback;
@@ -221,7 +221,7 @@ public enum DownloadFileHelper {
         File tempFile = null;
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ContentResolver resolver = ApplicationHolder.getAppContext().getContentResolver();
+                ContentResolver resolver = AppManager.INSTANCE.getApplication().getContentResolver();
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, tempFileName);
                 contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, StorageHelper.getRelativeDownloadsDirPath());
@@ -262,7 +262,7 @@ public enum DownloadFileHelper {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 if (tempFileContentUri != null) {
                     LogHelper.print("DownloadFileHelper_downloadFile handleWriteDownloadFile >=android Q uri rename start downloadFileName: " + downloadFileInfo.getFileName());
-                    ContentResolver resolver = ApplicationHolder.getAppContext().getContentResolver();
+                    ContentResolver resolver = AppManager.INSTANCE.getApplication().getContentResolver();
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, downloadFileInfo.getFileName());
                     contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, StorageHelper.getRelativeDownloadsDirPath());
@@ -312,7 +312,7 @@ public enum DownloadFileHelper {
             e.printStackTrace();
             try {
                 if (tempFileContentUri != null) {
-                    ContentResolver contentResolver = ApplicationHolder.getAppContext().getContentResolver();
+                    ContentResolver contentResolver = AppManager.INSTANCE.getApplication().getContentResolver();
                     contentResolver.delete(tempFileContentUri, null, null);
                     LogHelper.print("DownloadFileHelper_downloadFile handleWriteDownloadFile >=android Q uri try catch error delete uri");
                 }

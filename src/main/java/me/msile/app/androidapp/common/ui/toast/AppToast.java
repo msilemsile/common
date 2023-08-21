@@ -3,7 +3,7 @@ package me.msile.app.androidapp.common.ui.toast;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.core.MainThreadHolder;
 
 /**
@@ -23,7 +23,7 @@ public class AppToast {
      * @param showTime 显示时间
      */
     public static void toastMsgByStringResource(int strResId, int showTime) {
-        String msg = ApplicationHolder.getAppContext().getResources().getString(strResId);
+        String msg = AppManager.INSTANCE.getApplication().getResources().getString(strResId);
         toastMsg(msg, showTime);
     }
 
@@ -50,7 +50,7 @@ public class AppToast {
             @Override
             public void run() {
                 if (!TextUtils.isEmpty(msg)) {
-                    Toast.makeText(ApplicationHolder.getAppContext(), msg, showTime).show();
+                    Toast.makeText(AppManager.INSTANCE.getApplication(), msg, showTime).show();
                 }
             }
         });

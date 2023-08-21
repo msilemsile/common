@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 
 /**
  * 进程工具类
@@ -30,7 +30,7 @@ public final class ProcessUtils {
      * @return {@code true}: yes<br>{@code false}: no
      */
     public static boolean isMainProcess() {
-        return ApplicationHolder.getAppContext().getPackageName().equals(getCurrentProcessName());
+        return AppManager.INSTANCE.getApplication().getPackageName().equals(getCurrentProcessName());
     }
 
     /**
@@ -62,7 +62,7 @@ public final class ProcessUtils {
 
     private static String getCurrentProcessNameByAms() {
         try {
-            ActivityManager am = (ActivityManager) ApplicationHolder.getAppContext().getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager am = (ActivityManager) AppManager.INSTANCE.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
             if (am == null) return "";
             List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
             if (info == null || info.size() == 0) return "";
@@ -84,7 +84,7 @@ public final class ProcessUtils {
     private static String getCurrentProcessNameByReflect() {
         String processName = "";
         try {
-            Application app = ApplicationHolder.getAppContext();
+            Application app = AppManager.INSTANCE.getApplication();
             Field loadedApkField = app.getClass().getField("mLoadedApk");
             loadedApkField.setAccessible(true);
             Object loadedApk = loadedApkField.get(app);

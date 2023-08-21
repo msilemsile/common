@@ -22,7 +22,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.rx.DefaultObserver;
 import me.msile.app.androidapp.common.rx.RxTransformerUtils;
 import me.msile.app.androidapp.common.storage.StorageHelper;
@@ -112,7 +112,7 @@ public class WebViewHelper {
                             bos.flush();
                             bos.close();
                             if (needCompress) {
-                                List<File> fileList = Luban.with(ApplicationHolder.getAppContext())
+                                List<File> fileList = Luban.with(AppManager.INSTANCE.getApplication())
                                         .load(shareFile)
                                         .setTargetDir(StorageHelper.getExternalShareDirPath())
                                         .ignoreBy(250)
@@ -205,7 +205,7 @@ public class WebViewHelper {
                         bos.flush();
                         bos.close();
                         if (needCompress) {
-                            List<File> fileList = Luban.with(ApplicationHolder.getAppContext())
+                            List<File> fileList = Luban.with(AppManager.INSTANCE.getApplication())
                                     .load(shareFile)
                                     .setTargetDir(StorageHelper.getExternalShareDirPath())
                                     .ignoreBy(250)

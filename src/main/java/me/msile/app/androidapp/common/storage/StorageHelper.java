@@ -22,7 +22,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import me.msile.app.androidapp.common.constants.AppCommonConstants;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.log.LogHelper;
 import me.msile.app.androidapp.common.rx.DefaultObserver;
 import me.msile.app.androidapp.common.rx.RxTransformerUtils;
@@ -125,11 +125,11 @@ public class StorageHelper {
      * 获取文件 (先获取外置目录[/Android/data/x.x.x/files/]，失败获取app安装文件目录[data/data/x.x.x/files])
      */
     private static String getExternalFileRootPath() {
-        File externalFile = ApplicationHolder.getAppContext().getExternalFilesDir(null);
+        File externalFile = AppManager.INSTANCE.getApplication().getExternalFilesDir(null);
         if (externalFile != null) {
             return externalFile.getAbsolutePath();
         } else {
-            return ApplicationHolder.getAppContext().getFilesDir().getAbsolutePath();
+            return AppManager.INSTANCE.getApplication().getFilesDir().getAbsolutePath();
         }
     }
 
@@ -218,7 +218,7 @@ public class StorageHelper {
         List<String> fileNameList = new ArrayList<>();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ContentResolver contentResolver = ApplicationHolder.getAppContext().getContentResolver();
+                ContentResolver contentResolver = AppManager.INSTANCE.getApplication().getContentResolver();
                 Uri publicDirUri;
                 if (publicDirType == TYPE_PUBLIC_DIR_DCIM_IMAGE) {
                     publicDirUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -286,7 +286,7 @@ public class StorageHelper {
                             }
                             LogHelper.print("copyFileToOtherFile start copy cacheFile: " + cacheFileName);
                             try {
-                                FileInputStream fileInputStream = (FileInputStream) ApplicationHolder.getAppContext().getContentResolver().openInputStream(viewFileUri);
+                                FileInputStream fileInputStream = (FileInputStream) AppManager.INSTANCE.getApplication().getContentResolver().openInputStream(viewFileUri);
                                 boolean copyFileToOtherFile = FileUtils.copyFileToOtherFile(fileInputStream, cacheFile);
                                 if (copyFileToOtherFile) {
                                     CacheFileInfo cacheFileInfo = new CacheFileInfo(cacheFile);

@@ -19,7 +19,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.provider.FileProviderHelper;
 
 public class AndroidUtils {
@@ -28,9 +28,9 @@ public class AndroidUtils {
      * 获取当前版本
      */
     public static String getAppVersionName() {
-        PackageManager packageManager = ApplicationHolder.getAppContext().getPackageManager();
+        PackageManager packageManager = AppManager.INSTANCE.getApplication().getPackageManager();
         try {
-            PackageInfo packInfo = packageManager.getPackageInfo(ApplicationHolder.getAppContext().getPackageName(), 0);
+            PackageInfo packInfo = packageManager.getPackageInfo(AppManager.INSTANCE.getApplication().getPackageName(), 0);
             return packInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             Log.d("AndroidUtils", "getAppVersionName error");
@@ -45,8 +45,8 @@ public class AndroidUtils {
      */
     public static int getVersionCode() {
         try {
-            PackageManager packageManager = ApplicationHolder.getAppContext().getPackageManager();
-            PackageInfo packageInfo = packageManager.getPackageInfo(ApplicationHolder.getAppContext().getPackageName(), 0);
+            PackageManager packageManager = AppManager.INSTANCE.getApplication().getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageInfo(AppManager.INSTANCE.getApplication().getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,7 +58,7 @@ public class AndroidUtils {
      * 获取应用包名
      */
     public static String getAppPackageName() {
-        return ApplicationHolder.getAppContext().getPackageName();
+        return AppManager.INSTANCE.getApplication().getPackageName();
     }
 
     /**
@@ -71,7 +71,7 @@ public class AndroidUtils {
             return "";
         }
         try {
-            Context appContext = ApplicationHolder.getAppContext();
+            Context appContext = AppManager.INSTANCE.getApplication();
             ApplicationInfo ai = appContext.getPackageManager().getApplicationInfo(appContext.getPackageName(),
                     PackageManager.GET_META_DATA);
             if (null != ai) {
@@ -90,7 +90,7 @@ public class AndroidUtils {
      * 重启App
      */
     public static void restartApp() {
-        Application context = ApplicationHolder.getAppContext();
+        Application context = AppManager.INSTANCE.getApplication();
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(launchIntent);
@@ -114,7 +114,7 @@ public class AndroidUtils {
             Uri apkFileUri = FileProviderHelper.fromFile(file);
             intent.setDataAndType(apkFileUri, "application/vnd.android.package-archive");
             FileProviderHelper.addFileReadPermission(intent);
-            ApplicationHolder.getAppContext().startActivity(intent);
+            AppManager.INSTANCE.getApplication().startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,7 +124,7 @@ public class AndroidUtils {
      * 获取webView userAgent
      */
     public static String getWebUserAgent() {
-        return WebSettings.getDefaultUserAgent(ApplicationHolder.getAppContext());
+        return WebSettings.getDefaultUserAgent(AppManager.INSTANCE.getApplication());
     }
 
     public static String getFileUriEndName(Uri uri) {
@@ -149,7 +149,7 @@ public class AndroidUtils {
             if (fileUri != null) {
                 String fileName = null;
                 //1.check document file name
-                DocumentFile documentFile = DocumentFile.fromSingleUri(ApplicationHolder.getAppContext(), fileUri);
+                DocumentFile documentFile = DocumentFile.fromSingleUri(AppManager.INSTANCE.getApplication(), fileUri);
                 if (documentFile != null) {
                     fileName = documentFile.getName();
                     Log.i("AndroidUtils", "getFileRealNameFromUri DocumentFile fileName: " + fileName);

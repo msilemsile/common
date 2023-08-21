@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.rx.DefaultObserver;
 import me.msile.app.androidapp.common.rx.RxTransformerUtils;
 import me.msile.app.androidapp.common.storage.StorageHelper;
@@ -68,7 +68,7 @@ public class BitmapUtils {
             view.setDrawingCacheEnabled(false);
             view.destroyDrawingCache();
             if (needLuBanCompress) {
-                List<File> fileList = Luban.with(ApplicationHolder.getAppContext())
+                List<File> fileList = Luban.with(AppManager.INSTANCE.getApplication())
                         .load(shareFile)
                         .setTargetDir(StorageHelper.getExternalShareDirPath())
                         .ignoreBy(ignoreSize > 0 ? ignoreSize : 250)

@@ -11,7 +11,7 @@ import android.telephony.TelephonyManager;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 
 /**
  * 网络工具类
@@ -83,7 +83,7 @@ public final class NetworkUtils {
     @RequiresPermission(ACCESS_NETWORK_STATE)
     public static boolean isWifiConnected() {
         ConnectivityManager cm =
-                (ConnectivityManager) ApplicationHolder.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) AppManager.INSTANCE.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm == null) return false;
         NetworkInfo ni = cm.getActiveNetworkInfo();
         return ni != null && ni.getType() == ConnectivityManager.TYPE_WIFI;
@@ -198,7 +198,7 @@ public final class NetworkUtils {
     @RequiresPermission(ACCESS_NETWORK_STATE)
     private static boolean isEthernet() {
         final ConnectivityManager cm =
-                (ConnectivityManager) ApplicationHolder.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) AppManager.INSTANCE.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm == null) return false;
         final NetworkInfo info = cm.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
         if (info == null) return false;
@@ -210,7 +210,7 @@ public final class NetworkUtils {
     @RequiresPermission(ACCESS_NETWORK_STATE)
     private static NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager cm =
-                (ConnectivityManager) ApplicationHolder.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) AppManager.INSTANCE.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm == null) return null;
         return cm.getActiveNetworkInfo();
     }
@@ -218,7 +218,7 @@ public final class NetworkUtils {
     public static String getNTString() {
         String strNetworkType = "NULL";
 
-        NetworkInfo networkInfo = ((ConnectivityManager) ApplicationHolder.getAppContext()
+        NetworkInfo networkInfo = ((ConnectivityManager) AppManager.INSTANCE.getApplication()
                 .getSystemService(Context.CONNECTIVITY_SERVICE))
                 .getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {

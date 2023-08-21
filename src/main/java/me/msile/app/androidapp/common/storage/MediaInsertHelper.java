@@ -21,7 +21,7 @@ import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.msile.app.androidapp.common.constants.AppCommonConstants;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.provider.FileProviderHelper;
 import me.msile.app.androidapp.common.rx.DefaultObserver;
 import me.msile.app.androidapp.common.ui.toast.AppToast;
@@ -53,7 +53,7 @@ public class MediaInsertHelper {
                         String fileName = AppCommonConstants.APP_PREFIX_TAG + "_pic_" + System.currentTimeMillis() + (hasAlpha ? ".png" : ".jpg");
                         String mimeType = "image/*";
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            ContentResolver resolver = ApplicationHolder.getAppContext().getContentResolver();
+                            ContentResolver resolver = AppManager.INSTANCE.getApplication().getContentResolver();
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                             contentValues.put(MediaStore.Images.Media.MIME_TYPE, mimeType);
@@ -75,7 +75,7 @@ public class MediaInsertHelper {
                             values.put(MediaStore.Images.Media.MIME_TYPE, mimeType);
                             values.put(MediaStore.Images.Media.DATA, outFilePath);
                             //插入数据库
-                            ApplicationHolder.getAppContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                            AppManager.INSTANCE.getApplication().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                             emitter.onNext(outFilePath);
                         }
                         emitter.onComplete();
@@ -130,7 +130,7 @@ public class MediaInsertHelper {
                         String fileName = AppCommonConstants.APP_PREFIX_TAG + "_pic_" + System.currentTimeMillis() + (hasAlpha ? ".png" : ".jpg");
                         String mimeType = "image/*";
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            ContentResolver resolver = ApplicationHolder.getAppContext().getContentResolver();
+                            ContentResolver resolver = AppManager.INSTANCE.getApplication().getContentResolver();
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                             contentValues.put(MediaStore.Images.Media.MIME_TYPE, mimeType);
@@ -151,7 +151,7 @@ public class MediaInsertHelper {
                             values.put(MediaStore.Images.Media.MIME_TYPE, mimeType);
                             values.put(MediaStore.Images.Media.DATA, outFilePath);
                             //插入数据库
-                            ApplicationHolder.getAppContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                            AppManager.INSTANCE.getApplication().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                             emitter.onNext(outFilePath);
                         }
                         emitter.onComplete();
@@ -199,7 +199,7 @@ public class MediaInsertHelper {
                         String fileName = AppCommonConstants.APP_PREFIX_TAG + "_video_" + System.currentTimeMillis() + ".mp4";
                         String mimeType = "video/*";
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            ContentResolver resolver = ApplicationHolder.getAppContext().getContentResolver();
+                            ContentResolver resolver = AppManager.INSTANCE.getApplication().getContentResolver();
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                             contentValues.put(MediaStore.Video.Media.MIME_TYPE, mimeType);
@@ -221,7 +221,7 @@ public class MediaInsertHelper {
                             values.put(MediaStore.Video.Media.MIME_TYPE, mimeType);
                             values.put(MediaStore.Video.Media.DATA, outFilePath);
                             //插入数据库
-                            ApplicationHolder.getAppContext().getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+                            AppManager.INSTANCE.getApplication().getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
                             emitter.onNext(outFilePath);
                         }
                         emitter.onComplete();
@@ -263,7 +263,7 @@ public class MediaInsertHelper {
         File f = new File(path);
         mediaScanIntent.setData(FileProviderHelper.fromFile(f));
         FileProviderHelper.addFileWritePermission(mediaScanIntent);
-        ApplicationHolder.getAppContext().sendBroadcast(mediaScanIntent);
+        AppManager.INSTANCE.getApplication().sendBroadcast(mediaScanIntent);
     }
 
     public interface InsertMediaCallback {

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 
 /**
  * 状态栏工具类(api>=21)
@@ -84,12 +84,12 @@ public class StatusBarUtils {
      */
     public static int getStatusBarHeight() {
         int result = 0;
-        int resourceId = ApplicationHolder.getAppContext().getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = AppManager.INSTANCE.getApplication().getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            result = ApplicationHolder.getAppContext().getResources().getDimensionPixelSize(resourceId);
+            result = AppManager.INSTANCE.getApplication().getResources().getDimensionPixelSize(resourceId);
         }
         if (result <= 0) {
-            result = (int) (25 * ApplicationHolder.getAppContext().getResources().getDisplayMetrics().density);
+            result = (int) (25 * AppManager.INSTANCE.getApplication().getResources().getDisplayMetrics().density);
         }
         return result;
     }

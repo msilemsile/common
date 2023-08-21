@@ -32,7 +32,7 @@ import com.tencent.smtt.sdk.WebView;
 import java.util.Map;
 
 import me.msile.app.androidapp.common.R;
-import me.msile.app.androidapp.common.core.ApplicationHolder;
+import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.ui.fragment.BaseRecyclerFragment;
 import me.msile.app.androidapp.common.web.model.PermissionRequestType;
 import me.msile.app.androidapp.common.web.callback.WebViewHolder;
@@ -335,7 +335,7 @@ public class BaseX5WebFragment extends BaseRecyclerFragment implements BaseX5Web
 
     @Override
     public String getWebViewInfo() {
-        return "X5WebView: " + QbSdk.getTbsVersionForCrash(ApplicationHolder.getAppContext());
+        return "X5WebView: " + QbSdk.getTbsVersionForCrash(AppManager.INSTANCE.getApplication());
     }
 
     @Override
