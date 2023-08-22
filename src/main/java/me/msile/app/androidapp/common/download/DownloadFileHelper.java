@@ -34,6 +34,7 @@ import me.msile.app.androidapp.common.log.LogHelper;
 import me.msile.app.androidapp.common.net.callback.DefaultOkHttpCallback;
 import me.msile.app.androidapp.common.net.okhttp.OkHttpManager;
 import me.msile.app.androidapp.common.rx.DefaultObserver;
+import me.msile.app.androidapp.common.storage.model.PublicDirFileInfo;
 import me.msile.app.androidapp.common.storage.StorageHelper;
 import me.msile.app.androidapp.common.ui.toast.AppToast;
 import me.msile.app.androidapp.common.utils.AndroidUtils;
@@ -80,7 +81,7 @@ public enum DownloadFileHelper {
                             fileSuffix = originFileName.substring(lastIndexOf);
                         }
                         LogHelper.print("DownloadFileHelper_downloadFile originFileName: " + originFileName + " fileStartName: " + fileStartName + " fileSuffix: " + fileSuffix);
-                        List<String> localHistoryList = StorageHelper.listPubDownloadDirFileName();
+                        List<PublicDirFileInfo> localHistoryList = StorageHelper.listPublicDirFile(StorageHelper.TYPE_PUBLIC_DIR_DOWNLOAD);
                         String tempFileName;
                         int tempSuffixIndex = -1;
                         while (true) {
@@ -96,8 +97,8 @@ public enum DownloadFileHelper {
                             //1.check local history file name
                             if (!localHistoryList.isEmpty()) {
                                 for (int i = 0; i < localHistoryList.size(); i++) {
-                                    String historyFileName = localHistoryList.get(i);
-                                    if (TextUtils.equals(tempFileName, historyFileName)) {
+                                    PublicDirFileInfo publicDirFileInfo = localHistoryList.get(i);
+                                    if (TextUtils.equals(tempFileName, publicDirFileInfo.getDisplayName())) {
                                         hasSameFileName = true;
                                         break;
                                     }

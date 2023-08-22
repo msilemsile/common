@@ -3,7 +3,6 @@ package me.msile.app.androidapp.common.camera;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,7 +19,7 @@ import me.msile.app.androidapp.common.permissions.PermissionHelper;
 import me.msile.app.androidapp.common.permissions.callback.PermissionCallback;
 import me.msile.app.androidapp.common.rx.AutoDisposeUtils;
 import me.msile.app.androidapp.common.rx.DefaultDisposeObserver;
-import me.msile.app.androidapp.common.storage.MediaInsertHelper;
+import me.msile.app.androidapp.common.storage.MediaHelper;
 import me.msile.app.androidapp.common.ui.activity.ImmerseFullScreenActivity;
 import me.msile.app.androidapp.common.ui.dialog.AppAlertDialog;
 import me.msile.app.androidapp.common.ui.widget.shapelayout.ShapeImageView;
@@ -106,7 +105,7 @@ public class SimpleCameraXActivity extends ImmerseFullScreenActivity {
             public void onTakePictureSuccess(String picPath) {
                 ivCenter.setVisibility(View.VISIBLE);
                 GlideApp.with(SimpleCameraXActivity.this).load(picPath).into(ivCenter);
-                MediaInsertHelper.insertPicToGallery(picPath);
+                MediaHelper.insertPicToGallery(picPath);
             }
 
             @Override
@@ -122,7 +121,7 @@ public class SimpleCameraXActivity extends ImmerseFullScreenActivity {
                 refreshStopCaptureStatus();
                 ivCenter.setVisibility(View.VISIBLE);
                 GlideApp.with(SimpleCameraXActivity.this).load(videoPath).into(ivCenter);
-                MediaInsertHelper.insertVideoToMedia(videoPath);
+                MediaHelper.insertVideoToMedia(videoPath);
             }
 
             @Override

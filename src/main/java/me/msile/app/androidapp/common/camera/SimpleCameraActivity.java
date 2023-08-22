@@ -18,7 +18,7 @@ import me.msile.app.androidapp.common.permissions.PermissionHelper;
 import me.msile.app.androidapp.common.permissions.callback.PermissionCallback;
 import me.msile.app.androidapp.common.rx.AutoDisposeUtils;
 import me.msile.app.androidapp.common.rx.DefaultDisposeObserver;
-import me.msile.app.androidapp.common.storage.MediaInsertHelper;
+import me.msile.app.androidapp.common.storage.MediaHelper;
 import me.msile.app.androidapp.common.ui.activity.ImmerseFullScreenActivity;
 import me.msile.app.androidapp.common.ui.dialog.AppAlertDialog;
 import me.msile.app.androidapp.common.ui.widget.shapelayout.ShapeImageView;
@@ -104,7 +104,7 @@ public class SimpleCameraActivity extends ImmerseFullScreenActivity {
             public void onTakePictureSuccess(String picPath) {
                 ivCenter.setVisibility(View.VISIBLE);
                 GlideApp.with(SimpleCameraActivity.this).load(picPath).into(ivCenter);
-                MediaInsertHelper.insertPicToGallery(picPath);
+                MediaHelper.insertPicToGallery(picPath);
                 cameraHelper.startPreview();
             }
 
@@ -122,7 +122,7 @@ public class SimpleCameraActivity extends ImmerseFullScreenActivity {
                 refreshStopCaptureStatus();
                 ivCenter.setVisibility(View.VISIBLE);
                 GlideApp.with(SimpleCameraActivity.this).load(videoPath).into(ivCenter);
-                MediaInsertHelper.insertVideoToMedia(videoPath);
+                MediaHelper.insertVideoToMedia(videoPath);
             }
 
             @Override

@@ -26,6 +26,10 @@ import me.msile.app.androidapp.common.core.AppManager;
 import me.msile.app.androidapp.common.log.LogHelper;
 import me.msile.app.androidapp.common.rx.DefaultObserver;
 import me.msile.app.androidapp.common.rx.RxTransformerUtils;
+import me.msile.app.androidapp.common.storage.callback.CopyCacheFileCallback;
+import me.msile.app.androidapp.common.storage.callback.GetPublicDirFileCallback;
+import me.msile.app.androidapp.common.storage.model.CacheFileInfo;
+import me.msile.app.androidapp.common.storage.model.PublicDirFileInfo;
 import me.msile.app.androidapp.common.utils.AndroidUtils;
 import me.msile.app.androidapp.common.utils.FileUtils;
 
@@ -40,6 +44,9 @@ public class StorageHelper {
 
     //下载目录名称(android 10 +)
     public static String RELATIVE_EXTERNAL_DIR_PATH = "/" + AppCommonConstants.APP_PREFIX_TAG + "/";
+
+    public static String PUB_DIR_DCIM_PREFIX_TAG = Environment.DIRECTORY_DCIM + "/";
+    public static String PUB_DIR_DOWNLOAD_PREFIX_TAG = Environment.DIRECTORY_DOWNLOADS + "/";
 
     public static String CONTENT_DOCUMENT_BASE_PATH = "content://com.android.externalstorage.documents/document/primary:";
 
@@ -197,75 +204,194 @@ public class StorageHelper {
     /**
      * 列出保存在公共目录的文件名字(READ_EXTERNAL_STORAGE权限可选，未申请时之前app卸载的文件无法获取)
      */
-    public static int TYPE_PUBLIC_DIR_DOWNLOAD = 0;
-    public static int TYPE_PUBLIC_DIR_DCIM_IMAGE = 1;
-    public static int TYPE_PUBLIC_DIR_DCIM_VIDEO = 2;
+    public static int TYPE_PUBLIC_DIR_ALL = 0;
+    public static int TYPE_PUBLIC_DIR_DOWNLOAD = 1;
+    public static int TYPE_PUBLIC_DIR_DCIM = 2;
 
-    public static List<String> listPubDownloadDirFileName() {
-        return listPublicDirFileName(TYPE_PUBLIC_DIR_DOWNLOAD);
+    public static void listPubDirAllFile(GetPublicDirFileCallback fileCallback) {
+        Observable.create(new ObservableOnSubscribe<List<PublicDirFileInfo>>() {
+
+                    @Override
+                    public void subscribe(@NonNull ObservableEmitter<List<PublicDirFileInfo>> emitter) {
+                        try {
+                            List<PublicDirFileInfo> publicDirFile = listPublicDirFile(TYPE_PUBLIC_DIR_ALL);
+                            emitter.onNext(publicDirFile);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            emitter.onError(e);
+                        }
+                    }
+                }).compose(RxTransformerUtils.mainSchedulers())
+                .subscribe(new DefaultObserver<List<PublicDirFileInfo>>() {
+                    @Override
+                    protected void onSuccess(List<PublicDirFileInfo> publicDirFileInfos) {
+                        if (fileCallback != null) {
+                            fileCallback.onSuccess(publicDirFileInfos);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (fileCallback != null) {
+                            fileCallback.onError(e.getMessage());
+                        }
+                    }
+                });
     }
 
-    public static List<String> listPubDCIMDirFileName() {
-        List<String> imageDirFileName = listPublicDirFileName(TYPE_PUBLIC_DIR_DCIM_IMAGE);
-        List<String> videoDirFileName = listPublicDirFileName(TYPE_PUBLIC_DIR_DCIM_VIDEO);
-        List<String> dcimDirList = new ArrayList<>();
-        dcimDirList.addAll(imageDirFileName);
-        dcimDirList.addAll(videoDirFileName);
-        return dcimDirList;
+    public static void listPubDownloadDirFile(GetPublicDirFileCallback fileCallback) {
+        Observable.create(new ObservableOnSubscribe<List<PublicDirFileInfo>>() {
+
+                    @Override
+                    public void subscribe(@NonNull ObservableEmitter<List<PublicDirFileInfo>> emitter) {
+                        try {
+                            List<PublicDirFileInfo> publicDirFile = listPublicDirFile(TYPE_PUBLIC_DIR_DOWNLOAD);
+                            emitter.onNext(publicDirFile);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            emitter.onError(e);
+                        }
+                    }
+                }).compose(RxTransformerUtils.mainSchedulers())
+                .subscribe(new DefaultObserver<List<PublicDirFileInfo>>() {
+                    @Override
+                    protected void onSuccess(List<PublicDirFileInfo> publicDirFileInfos) {
+                        if (fileCallback != null) {
+                            fileCallback.onSuccess(publicDirFileInfos);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (fileCallback != null) {
+                            fileCallback.onError(e.getMessage());
+                        }
+                    }
+                });
     }
 
-    public static List<String> listPublicDirFileName(int publicDirType) {
-        List<String> fileNameList = new ArrayList<>();
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ContentResolver contentResolver = AppManager.INSTANCE.getApplication().getContentResolver();
-                Uri publicDirUri;
-                if (publicDirType == TYPE_PUBLIC_DIR_DCIM_IMAGE) {
-                    publicDirUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if (publicDirType == TYPE_PUBLIC_DIR_DCIM_VIDEO) {
-                    publicDirUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else {
-                    publicDirUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
-                }
-                Cursor cursor = contentResolver.query(
-                        publicDirUri,
-                        null,
-                        MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME + "=?",
-                        new String[]{AppCommonConstants.APP_PREFIX_TAG}, null
-                );
-                if (cursor != null) {
-//                    int fileIdIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
-                    int fileNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
-                    while (cursor.moveToNext()) {
+    public static void listPubDCIMDirFile(GetPublicDirFileCallback fileCallback) {
+        Observable.create(new ObservableOnSubscribe<List<PublicDirFileInfo>>() {
+
+                    @Override
+                    public void subscribe(@NonNull ObservableEmitter<List<PublicDirFileInfo>> emitter) {
+                        try {
+                            List<PublicDirFileInfo> publicDirFile = listPublicDirFile(TYPE_PUBLIC_DIR_DCIM);
+                            emitter.onNext(publicDirFile);
+                            emitter.onComplete();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            emitter.onError(e);
+                        }
+                    }
+                }).compose(RxTransformerUtils.mainSchedulers())
+                .subscribe(new DefaultObserver<List<PublicDirFileInfo>>() {
+                    @Override
+                    protected void onSuccess(List<PublicDirFileInfo> publicDirFileInfos) {
+                        if (fileCallback != null) {
+                            fileCallback.onSuccess(publicDirFileInfos);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (fileCallback != null) {
+                            fileCallback.onError(e.getMessage());
+                        }
+                    }
+                });
+    }
+
+    public static List<PublicDirFileInfo> listPublicDirFile(int publicDirType) {
+        List<PublicDirFileInfo> pubDirFileList = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver contentResolver = AppManager.INSTANCE.getApplication().getContentResolver();
+            Uri publicDirUri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            String[] projection = new String[]{MediaStore.Files.FileColumns._ID,
+                    MediaStore.Files.FileColumns.DISPLAY_NAME,
+                    MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME,
+                    MediaStore.Files.FileColumns.RELATIVE_PATH,
+                    MediaStore.Files.FileColumns.DATA};
+            Cursor cursor = contentResolver.query(
+                    publicDirUri,
+                    projection,
+                    null,
+                    null, null
+            );
+            if (cursor != null) {
+                int fileIdIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID);
+                int fileNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                int dirNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME);
+                int relativePathIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.RELATIVE_PATH);
+                int dataIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA);
+                while (cursor.moveToNext()) {
+                    //文件目录名
+                    String dirName = cursor.getString(dirNameIndex);
+                    if (TextUtils.equals(dirName, AppCommonConstants.APP_PREFIX_TAG)) {
                         //文件名
                         String fileName = cursor.getString(fileNameIndex);
-                        fileNameList.add(fileName);
-                        //uri
-//                        long fileId = cursor.getLong(fileIdIndex);
-//                        Uri pathUri = downloadUri.buildUpon().appendPath(String.valueOf(fileId)).build();
+                        //文件id
+                        long fileId = cursor.getLong(fileIdIndex);
+                        //文件相对路径
+                        String relativePath = cursor.getString(relativePathIndex);
+                        //文件真实路径
+                        String data = cursor.getString(dataIndex);
+                        if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+                            if (relativePath != null && relativePath.contains(PUB_DIR_DCIM_PREFIX_TAG)) {
+                                pubDirFileList.add(new PublicDirFileInfo(fileId, fileName, relativePath, data));
+                            } else if (data != null && data.contains(PUB_DIR_DCIM_PREFIX_TAG)) {
+                                pubDirFileList.add(new PublicDirFileInfo(fileId, fileName, relativePath, data));
+                            }
+                        } else if (publicDirType == TYPE_PUBLIC_DIR_DOWNLOAD) {
+                            if (relativePath != null && relativePath.contains(PUB_DIR_DOWNLOAD_PREFIX_TAG)) {
+                                pubDirFileList.add(new PublicDirFileInfo(fileId, fileName, relativePath, data));
+                            } else if (data != null && data.contains(PUB_DIR_DOWNLOAD_PREFIX_TAG)) {
+                                pubDirFileList.add(new PublicDirFileInfo(fileId, fileName, relativePath, data));
+                            }
+                        } else {
+                            pubDirFileList.add(new PublicDirFileInfo(fileId, fileName, relativePath, data));
+                        }
                     }
-                    cursor.close();
                 }
+                cursor.close();
+            }
+        } else {
+            if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+                pubDirFileList.addAll(listPublicDirFileBelowQ(TYPE_PUBLIC_DIR_DCIM));
+            } else if (publicDirType == TYPE_PUBLIC_DIR_DOWNLOAD) {
+                pubDirFileList.addAll(listPublicDirFileBelowQ(TYPE_PUBLIC_DIR_DOWNLOAD));
             } else {
-                String publicDirPath;
-                if (publicDirType == TYPE_PUBLIC_DIR_DCIM_IMAGE) {
-                    publicDirPath = getPublicDCIMDirPath();
-                } else {
-                    publicDirPath = getPublicDownloadsDirPath();
-                }
-                File downloadDir = new File(publicDirPath);
-                if (downloadDir.exists() && downloadDir.isDirectory()) {
-                    String[] fileNames = downloadDir.list();
-                    if (fileNames != null) {
-                        fileNameList.addAll(Arrays.asList(fileNames));
-                    }
+                pubDirFileList.addAll(listPublicDirFileBelowQ(TYPE_PUBLIC_DIR_DCIM));
+                pubDirFileList.addAll(listPublicDirFileBelowQ(TYPE_PUBLIC_DIR_DOWNLOAD));
+            }
+        }
+        Log.i("StorageHelper", "PublicDirFileList size: " + pubDirFileList.size() + " fileNameList: " + Arrays.toString(pubDirFileList.toArray()));
+        return pubDirFileList;
+    }
+
+    public static List<PublicDirFileInfo> listPublicDirFileBelowQ(int publicDirType) {
+        List<PublicDirFileInfo> pubDirFileList = new ArrayList<>();
+        String publicDirPath;
+        String relativePath;
+        if (publicDirType == TYPE_PUBLIC_DIR_DCIM) {
+            publicDirPath = getPublicDCIMDirPath();
+            relativePath = PUB_DIR_DCIM_PREFIX_TAG + AppCommonConstants.APP_PREFIX_TAG;
+        } else {
+            publicDirPath = getPublicDownloadsDirPath();
+            relativePath = PUB_DIR_DOWNLOAD_PREFIX_TAG + AppCommonConstants.APP_PREFIX_TAG;
+        }
+        File downloadDir = new File(publicDirPath);
+        if (downloadDir.exists() && downloadDir.isDirectory()) {
+            File[] listFiles = downloadDir.listFiles();
+            if (listFiles != null) {
+                for (File file : listFiles) {
+                    pubDirFileList.add(new PublicDirFileInfo(-1, file.getName(), relativePath, file.getAbsolutePath()));
                 }
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
         }
-        Log.i("StorageHelper", "listDownloadFilesName size: " + fileNameList.size() + " fileNameList: " + Arrays.toString(fileNameList.toArray()));
-        return fileNameList;
+        return pubDirFileList;
     }
 
     public static void copyUriToCacheFile(final List<Uri> fileUriList, final CopyCacheFileCallback copyCacheFileCallback) {

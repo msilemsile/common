@@ -1,4 +1,4 @@
-package me.msile.app.androidapp.common.storage;
+package me.msile.app.androidapp.common.storage.model;
 
 import android.net.Uri;
 

@@ -3,7 +3,7 @@ package me.msile.app.androidapp.common.extend;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.msile.app.androidapp.common.storage.CacheFileInfo;
+import me.msile.app.androidapp.common.storage.model.CacheFileInfo;
 
 public enum OpenFileProxyHelper {
     INSTANCE;
