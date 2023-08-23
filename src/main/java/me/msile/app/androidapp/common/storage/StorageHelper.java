@@ -203,6 +203,7 @@ public class StorageHelper {
 
     /**
      * 列出保存在公共目录的文件名字(READ_EXTERNAL_STORAGE权限可选，未申请时之前app卸载的文件无法获取)
+     * targetsdk 29 android 10以上只能获取本应用的媒体文件，非媒体文件不可以获取（部分厂商手机可以,原生安卓系统不可以）; 可通过SAF框架授权后获取，或者降低targetsdk
      */
     public static int TYPE_PUBLIC_DIR_ALL = 0;
     public static int TYPE_PUBLIC_DIR_DOWNLOAD = 1;

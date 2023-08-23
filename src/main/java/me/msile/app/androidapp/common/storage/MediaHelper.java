@@ -278,6 +278,7 @@ public class MediaHelper {
 
     /**
      * 列出保存在公共目录的文件名字(READ_EXTERNAL_STORAGE权限可选，未申请时之前app卸载的文件无法获取)
+     * targetsdk 29 android 10以上只能获取本应用的媒体文件，非媒体文件不可以获取（部分厂商手机可以,原生安卓系统不可以）; 可通过SAF框架授权后获取，或者降低targetsdk
      */
     public static int TYPE_MEDIA_PUBLIC_DOWNLOAD = 1;
     public static int TYPE_MEDIA_PUBLIC_DCIM = 2;
@@ -350,6 +351,7 @@ public class MediaHelper {
         List<PublicDirFileInfo> publicDirFileInfoList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (publicDirType == TYPE_MEDIA_PUBLIC_DCIM) {
+                //ps:app卸载后，通过READ_EXTERNAL_STORAGE权限可获取之前的文件
                 List<PublicDirFileInfo> imageFileList = queryPubDirFile(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 List<PublicDirFileInfo> videoFileList = queryPubDirFile(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
                 publicDirFileInfoList.addAll(imageFileList);
