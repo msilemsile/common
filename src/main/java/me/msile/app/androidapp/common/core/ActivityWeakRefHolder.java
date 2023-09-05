@@ -142,7 +142,7 @@ public abstract class ActivityWeakRefHolder implements LifecycleEventObserver {
     }
 
     protected void onActivityDestroy() {
-        onClear();
+        clear();
     }
 
 }
