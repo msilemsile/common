@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.List;
 
 import me.msile.app.androidapp.common.storage.StorageHelper;
 
@@ -227,5 +230,25 @@ public final class IntentUtils {
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
+    }
+
+    public static <T extends Parcelable> T getParcelable(Intent intent, String name, Class<T> tClass) {
+        T t;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            t = intent.getParcelableExtra(name, tClass);
+        } else {
+            t = intent.getParcelableExtra(name);
+        }
+        return t;
+    }
+
+    public static <T extends Parcelable> T[] getParcelableArray(Intent intent, String name, Class<T> tClass) {
+        T[] tArray;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            tArray = intent.getParcelableArrayExtra(name, tClass);
+        } else {
+            tArray = (T[]) intent.getParcelableArrayExtra(name);
+        }
+        return tArray;
     }
 }
